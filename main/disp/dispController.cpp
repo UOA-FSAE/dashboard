@@ -88,11 +88,26 @@ void drawString(uint16_t x, uint16_t y, TEXT_ALIGNMENT alignment, uint16_t colou
 }
 
 [[noreturn]] void updateDisplay(void *pvParameters){
+
+	// Message handle and data
+    auto message_buffer = (MessageBufferHandle_t) pvParameters;
+    struct Vehicle_Data data{};
+    resetDataStructure(data);
+
+
+
     //initialize display
     d->initDisplay();
     vTaskDelay(500/portTICK_RATE_MS);
 
     while(true){
-        drawString((DISPLAY_WIDTH/4),	(MARGIN + 100), CENTER,  (uint16_t)0xFFFF, "Hello", &FreeSans12pt7b);
+		if (xMessageBufferReceive(
+                message_buffer,
+                &data,
+                sizeof(struct Vehicle_Data),
+                pdMS_TO_TICKS(1000)
+        )) {
+			drawString((DISPLAY_WIDTH/4),	(MARGIN + 100), CENTER,  (uint16_t)0xFFFF, "Hello", &FreeSans12pt7b);
+		}
     }
 }
