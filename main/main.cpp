@@ -6,6 +6,7 @@
 #include "freertos/task.h"
 #include "freertos/message_buffer.h"
 #include "leds/ledControle.h"
+#include "disp/dispController.h"
 #include "vehicle/vehicleData.h"
 #include "can/canFrames.h"
 
@@ -30,26 +31,35 @@ extern void app_main()
 
         // Create tasks
         xTaskCreatePinnedToCore(
-                &updateCAN,
-                "UpdateCAN",
-                2048,
-                (void *) message_buffers,
-                2,
-                nullptr,
-                0
+            &updateCAN,
+            "UpdateCAN",
+            2048,
+            (void *) message_buffers,
+            2,
+            nullptr,
+            0
         );
 
         xTaskCreatePinnedToCore( // Led task
-                &updateLEDs,
-                "UpdateLEDs",
-                2048,
-                (void *) message_buffer_led,
-                2,
-                nullptr,
-                0
+            &updateLEDs,
+            "UpdateLEDs",
+            2048,
+            (void *) message_buffer_led,
+            2,
+            nullptr,
+            0
         );
 
 
         // TODO: Create Display task
+        xTaskCreatePinnedToCore( // DisplayTask
+            &updateDisplay,
+            "UpdateDisp",
+            2048,
+            (void *) message_buffer_display,
+            2,
+            nullptr,
+            0
+        );
     }
 }
