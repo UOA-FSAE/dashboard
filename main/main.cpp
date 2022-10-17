@@ -59,7 +59,7 @@ extern void app_main()
             (void *) message_buffer_display,
             2,
             nullptr,
-            0
+            1
         );
     }
 }

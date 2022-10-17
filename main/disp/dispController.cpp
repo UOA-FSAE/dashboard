@@ -1,13 +1,20 @@
 #include <cstdlib>
 #include <cstdint>
 #include <cmath>
+#include <stdio.h>
+#include <cstring>
+#include <string>
+#include <vector>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "freertos/portmacro.h"
 #include "freertos/message_buffer.h"
+
+//our stuff
 #include "dispController.h"
 #include "disp.h"
 #include "vehicle/vehicleData.h"
+#include "can/canFrames.h"
 
 //Fonts and bitmaps for screen
 #include "../inc/fonts/gfxfont.h"
@@ -28,6 +35,7 @@ disp *d = new disp(480, 320);
 
 //This function updates and draws data to the screen if it's new/updated
 template<class dataType>
+
 void drawString(dataType &oldData, dataType &newData, uint16_t x, uint16_t y, TEXT_ALIGNMENT alignment, uint16_t colour, const char * format, const GFXfont *font) {
 
 	//ONLY bother to do something if the data actually changes!
