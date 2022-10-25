@@ -32,18 +32,11 @@
 //Colors
 colour565 textColour = 0xFFFFFF;
 
-//TODO:  Move this inside the main loop and pass to other functions
-//I think this is still fine though because the only thing writing to this will
-//be on core 1
-
-//This is our display!
-disp *d = new disp(480, 320);
-
 //This function updates and draws data to the screen if it's new/updated
 template<class dataType>
 
 //TODO:  Perhaps move this into disp.cpp, not sure why it was initially in main
-void drawString(dataType &oldData, dataType &newData, uint16_t x, uint16_t y, TEXT_ALIGNMENT alignment, uint16_t colour, const char * format, const GFXfont *font) {
+void drawString(disp *d,dataType &oldData, dataType &newData, uint16_t x, uint16_t y, TEXT_ALIGNMENT alignment, uint16_t colour, const char * format, const GFXfont *font) {
 
 	//ONLY bother to do something if the data actually changes!
 	if (newData != oldData) {
@@ -74,7 +67,7 @@ void drawString(dataType &oldData, dataType &newData, uint16_t x, uint16_t y, TE
 }
 
 //Overloaded drawString function for non-data text drawing
-void drawString(uint16_t x, uint16_t y, TEXT_ALIGNMENT alignment, uint16_t colour, const char * format, const GFXfont *font) {
+void drawString(disp *d,uint16_t x, uint16_t y, TEXT_ALIGNMENT alignment, uint16_t colour, const char * format, const GFXfont *font) {
 
 	//Buffer for storing char array
 	char buf[50];
@@ -95,6 +88,14 @@ void drawString(uint16_t x, uint16_t y, TEXT_ALIGNMENT alignment, uint16_t colou
 }
 
 [[noreturn]] void updateDisplay(void *pvParameters){
+
+	//TODO:  Move this inside the main loop and pass to other functions
+	//I think this is still fine though because the only thing writing to this will
+	//be on core 1
+
+	//This is our display!
+	disp *d = new disp(480, 320);
+
 	// Message handle and data
     auto message_buffer = (MessageBufferHandle_t) pvParameters;
     struct Vehicle_Data data{};
@@ -110,7 +111,7 @@ void drawString(uint16_t x, uint16_t y, TEXT_ALIGNMENT alignment, uint16_t colou
     vTaskDelay(500/portTICK_RATE_MS);
 
 	//TODO:  Implement pages as in original
-	drawString((DISPLAY_WIDTH/4),	(MARGIN + 100), CENTER,  (uint16_t)0xFFFF, "Hello", &FreeSans12pt7b);
+	drawString(d,(DISPLAY_WIDTH/4),	(MARGIN + 100), CENTER,  (uint16_t)0xFFFF, "Hello", &FreeSans12pt7b);
 
     while(true){
 		if (xMessageBufferReceive(
@@ -122,7 +123,7 @@ void drawString(uint16_t x, uint16_t y, TEXT_ALIGNMENT alignment, uint16_t colou
         )) {
 			//If recieved a message
 			//This is a test to draw the string, we passing a pointer to the data, should currently write 0
-			drawString(data_displayed.ts.soc,data.ts.soc,(DISPLAY_WIDTH - MARGIN),200,RIGHT,textColour.raw, "%u%%", &FreeSans12pt7b);
+			drawString(d,data_displayed.ts.soc,data.ts.soc,(DISPLAY_WIDTH - MARGIN),200,RIGHT,textColour.raw, "%u%%", &FreeSans12pt7b);
 		}
     }
 }
