@@ -32,4 +32,4 @@
 *.app
 
 # Ignore the build
-/build/
+./build/*
