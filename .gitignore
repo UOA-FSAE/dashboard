@@ -31,5 +31,7 @@
 *.out
 *.app
 
-# Ignore the build
+# Ignore the build and environment stuff
 build/
+.vscode/
+.idea/
