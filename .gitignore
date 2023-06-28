@@ -11,6 +11,7 @@
 cmake-build-debug/
 Debug/
 Release/
+.idea/
 
 # Precompiled Headers
 *.gch
