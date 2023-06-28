@@ -122,8 +122,7 @@ int main(void)
 	  {
 		 Error_Handler();
 	  }
-
-	  HAL_Delay(2);
+	  HAL_Delay(100);
   }
   /* USER CODE END 3 */
 }
@@ -349,19 +348,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
-{
-  CAN_RxHeaderTypeDef RxHeader;
-  uint8_t RxData[8];
-
-  if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /* Here, you can use the RxHeader and RxData variables */
-}
 
 /* USER CODE END 4 */
 
