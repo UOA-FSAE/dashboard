@@ -9,6 +9,8 @@
 
 # Ignore CMAKE
 cmake-build-debug/
+Debug/
+Release/
 
 # Precompiled Headers
 *.gch
