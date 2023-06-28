@@ -52,9 +52,9 @@ SPI_HandleTypeDef hspi2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_QUADSPI_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_SPI2_Init(void);
-static void MX_QUADSPI_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -92,9 +92,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_QUADSPI_Init();
   MX_CAN1_Init();
   MX_SPI2_Init();
-  MX_QUADSPI_Init();
   /* USER CODE BEGIN 2 */
 
   // Can TX Header
@@ -105,7 +105,7 @@ int main(void)
   TxHeader.IDE = CAN_ID_STD;
   TxHeader.StdId = 0x123;
   TxHeader.RTR = CAN_RTR_DATA;
-  TxHeader.DLC = 2;
+  TxHeader.DLC = 3;
 
   TxData[0] = 50;
   TxData[1] = 0xAA;
