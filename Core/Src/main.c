@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "led.h"
+#include "vehicle.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -117,6 +118,11 @@ int main(void) {
     // LED Initializations
     init_led();
     set_led(IMD, 15, 255, 0, 0);    //Set first LED to red
+
+    // Vehicle Data Initializations
+    Vehicle_Data the_car;
+    resetDataStructure(&the_car);
+
     /* USER CODE END 2 */
 
     /* Infinite loop */
