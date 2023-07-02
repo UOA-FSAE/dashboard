@@ -18,12 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "led.h"
-#include "vehicle.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "led.h"
+#include "vehicle.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +46,8 @@ QSPI_HandleTypeDef hqspi;
 
 SPI_HandleTypeDef hspi2;
 
+TIM_HandleTypeDef htim14;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -61,6 +62,8 @@ static void MX_QUADSPI_Init(void);
 static void MX_CAN1_Init(void);
 
 static void MX_SPI2_Init(void);
+
+static void MX_TIM14_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -100,6 +103,7 @@ int main(void) {
     MX_QUADSPI_Init();
     MX_CAN1_Init();
     MX_SPI2_Init();
+    MX_TIM14_Init();
     /* USER CODE BEGIN 2 */
 
     // Can TX Header
@@ -115,9 +119,10 @@ int main(void) {
     TxData[0] = 50;
     TxData[1] = 0xAA;
 
-    // LED Initializations
+    // LED Initializationss
     init_led();
-    set_led(IMD, 15, 255, 0, 0);    //Set first LED to red
+    set_led(ERROR2, LED_MAX_BRIGHTNESS, LED_RED);    //Set first LED to red
+    set_all_red();
 
     // Vehicle Data Initializations
     Vehicle_Data the_car;
@@ -135,7 +140,7 @@ int main(void) {
             Error_Handler();
         }
         update_led(&hspi2);
-        HAL_Delay(100);
+        HAL_Delay(2);
     }
     /* USER CODE END 3 */
 }
@@ -310,13 +315,55 @@ static void MX_SPI2_Init(void) {
     hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
     hspi2.Init.CRCPolynomial = 7;
     hspi2.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
-    hspi2.Init.NSSPMode = SPI_NSS_PULSE_ENABLE;
+    hspi2.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
     if (HAL_SPI_Init(&hspi2) != HAL_OK) {
         Error_Handler();
     }
+
     /* USER CODE BEGIN SPI2_Init 2 */
 
     /* USER CODE END SPI2_Init 2 */
+
+}
+
+/**
+  * @brief TIM14 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM14_Init(void) {
+
+    /* USER CODE BEGIN TIM14_Init 0 */
+
+    /* USER CODE END TIM14_Init 0 */
+
+    TIM_OC_InitTypeDef sConfigOC = {0};
+
+    /* USER CODE BEGIN TIM14_Init 1 */
+
+    /* USER CODE END TIM14_Init 1 */
+    htim14.Instance = TIM14;
+    htim14.Init.Prescaler = 0;
+    htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
+    htim14.Init.Period = 65535;
+    htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+    if (HAL_TIM_Base_Init(&htim14) != HAL_OK) {
+        Error_Handler();
+    }
+    if (HAL_TIM_PWM_Init(&htim14) != HAL_OK) {
+        Error_Handler();
+    }
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = 0;
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+    if (HAL_TIM_PWM_ConfigChannel(&htim14, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) {
+        Error_Handler();
+    }
+    /* USER CODE BEGIN TIM14_Init 2 */
+
+    /* USER CODE END TIM14_Init 2 */
 
 }
 
