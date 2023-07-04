@@ -12,6 +12,7 @@
 typedef struct {
 
     uint8_t soc;            // 0 to 100%
+
     float voltage;            // 0.0 to 600.0V
     float current;            // -15.0A to 100.0A SIGNED
 
