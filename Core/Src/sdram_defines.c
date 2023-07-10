@@ -1,5 +1,8 @@
 #include "main.h"
 #include "sdram_defines.h"
+#include <stdbool.h>
+
+static bool ram_initialized = false;
 
 static int SDRAM_SendCommand(uint32_t CommandMode, int32_t Bank, uint32_t RefreshNum, uint32_t RegVal,
                              SDRAM_HandleTypeDef *hsdram1) {
@@ -37,4 +40,19 @@ void SDRAM_Init(SDRAM_HandleTypeDef *hsdram1) {
     SDRAM_SendCommand(FMC_SDRAM_CMD_LOAD_MODE, 1, 1, temp, hsdram1);
 
     HAL_SDRAM_ProgramRefreshRate(hsdram1, 1668);
+}
+
+float SDRAM_Test(long int size_of_ram_in_bytes, uint32_t *ram_address) {
+    long int successes = 0;
+    long int blocks_to_test = size_of_ram_in_bytes / 4;
+    for (long int i = 0; i < blocks_to_test; i++) {
+        ram_address[i] = 0xFFFFFFFF;
+    }
+    for (int i = 0; i < blocks_to_test; i++) {
+        if (ram_address[i] == 0xFFFFFFFF) {
+            successes++;
+        }
+        ram_address[i] = 0x00000000;
+    }
+    return (double) successes / (double) blocks_to_test;
 }

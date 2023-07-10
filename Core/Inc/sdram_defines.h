@@ -1,6 +1,5 @@
-//
-// Created by tazukiswift on 8/07/23.
-//
+// This ram driver is for the , courtesy of this post below:
+// https://blog.csdn.net/qq_45467083/article/details/109425825
 
 #ifndef DASHBOARD_SDRAM_FMC_DRV_H
 #define DASHBOARD_SDRAM_FMC_DRV_H
@@ -18,5 +17,7 @@
 #define SDRAM_MODEREG_WRITEBURST_MODE_SINGLE ((uint16_t)0x0200)
 
 void SDRAM_Init(SDRAM_HandleTypeDef *hsdram1);
+
+float SDRAM_Test(long int size_of_ram_in_bytes, uint32_t *ram_address);
 
 #endif //DASHBOARD_SDRAM_FMC_DRV_H

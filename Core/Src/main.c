@@ -129,19 +129,10 @@ int main(void) {
     set_all_red();
 
     SDRAM_Init(&hsdram1);
-
     volatile uint32_t *ram_address = (uint32_t *) 0xC0000000;
 
 
-    for (int i = 0; i < 100; i++) {
-        ram_address[i] = i;
-    }
-
-    uint32_t test_array[100] = {0};
-
-    for (int i = 0; i < 100; i++) {
-        test_array[i] = ram_address[i];
-    }
+    float success_rate = SDRAM_Test(32000000,ram_address);
 
 
 
