@@ -2,8 +2,6 @@
 #include "sdram_defines.h"
 #include <stdbool.h>
 
-static bool ram_initialized = false;
-
 static int SDRAM_SendCommand(uint32_t CommandMode, int32_t Bank, uint32_t RefreshNum, uint32_t RegVal,
                              SDRAM_HandleTypeDef *hsdram1) {
     uint32_t CommandTarget;
