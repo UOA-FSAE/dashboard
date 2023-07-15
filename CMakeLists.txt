@@ -49,7 +49,7 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(Core/Inc Drivers/STM32F7xx_HAL_Driver/Inc Drivers/STM32F7xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32F7xx/Include Drivers/CMSIS/Include)
+include_directories(Core/Inc Drivers/STM32F7xx_HAL_Driver/Inc Drivers/STM32F7xx_HAL_Driver/Inc/Legacy Drivers/CMSIS/Device/ST/STM32F7xx/Include Drivers/CMSIS/Include "${workspace_loc:/${ProjName}/Drivers/lvgl}")
 
 add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32F750xx)
 
