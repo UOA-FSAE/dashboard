@@ -18,6 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "can.h"
+#include "ltdc.h"
+#include "spi.h"
+#include "gpio.h"
+#include "fmc.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -26,6 +31,7 @@
 #include "sdram_defines.h"
 #include <stdlib.h>
 #include <string.h>
+#include "/home/tazukiswift/Work/Prog/dashboard/Drivers/lvgl/src/lvgl.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,15 +50,6 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-CAN_HandleTypeDef hcan1;
-
-LTDC_HandleTypeDef hltdc;
-
-SPI_HandleTypeDef hspi2;
-
-TIM_HandleTypeDef htim14;
-
-SDRAM_HandleTypeDef hsdram1;
 
 /* USER CODE BEGIN PV */
 
@@ -60,18 +57,6 @@ SDRAM_HandleTypeDef hsdram1;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-
-static void MX_GPIO_Init(void);
-
-static void MX_CAN1_Init(void);
-
-static void MX_SPI2_Init(void);
-
-static void MX_TIM14_Init(void);
-
-static void MX_FMC_Init(void);
-
-static void MX_LTDC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -79,441 +64,161 @@ static void MX_LTDC_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// Private local flush buffer function
+void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+{
+  HAL_LTDC_SetAddress(&hltdc, (uint32_t)color_p, LTDC_LAYER_1);
+
+  /* IMPORTANT!!!
+  * Inform the graphics library that you are ready with the flushing*/
+  lv_disp_flush_ready(disp_drv);
+}
+
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
-int main(void) {
-    /* USER CODE BEGIN 1 */
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
 
-    /* USER CODE END 1 */
+  /* USER CODE END 1 */
 
-    /* MCU Configuration--------------------------------------------------------*/
+  /* MCU Configuration--------------------------------------------------------*/
 
-    /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-    HAL_Init();
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
 
-    /* USER CODE BEGIN Init */
+  /* USER CODE BEGIN Init */
 
-    /* USER CODE END Init */
+  /* USER CODE END Init */
 
-    /* Configure the system clock */
-    SystemClock_Config();
+  /* Configure the system clock */
+  SystemClock_Config();
 
-    /* USER CODE BEGIN SysInit */
+  /* USER CODE BEGIN SysInit */
 
-    /* USER CODE END SysInit */
+  /* USER CODE END SysInit */
 
-    /* Initialize all configured peripherals */
-    MX_GPIO_Init();
-    MX_CAN1_Init();
-    MX_SPI2_Init();
-    MX_TIM14_Init();
-    MX_FMC_Init();
-    MX_LTDC_Init();
-    /* USER CODE BEGIN 2 */
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_CAN1_Init();
+  MX_FMC_Init();
+  MX_LTDC_Init();
+  MX_SPI2_Init();
+  /* USER CODE BEGIN 2 */
+  // Can TX Header
+  //    CAN_TxHeaderTypeDef TxHeader;
+  //    uint8_t TxData[8] = {0};
+  //    uint32_t TxMailbox;
+  //
+  //    TxHeader.IDE = CAN_ID_STD;
+  //    TxHeader.StdId = 0x123;
+  //    TxHeader.RTR = CAN_RTR_DATA;
+  //    TxHeader.DLC = 3;
+  //
+  //    TxData[0] = 50;
+  //    TxData[1] = 0xAA;
 
-    // Can TX Header
-//    CAN_TxHeaderTypeDef TxHeader;
-//    uint8_t TxData[8] = {0};
-//    uint32_t TxMailbox;
-//
-//    TxHeader.IDE = CAN_ID_STD;
-//    TxHeader.StdId = 0x123;
-//    TxHeader.RTR = CAN_RTR_DATA;
-//    TxHeader.DLC = 3;
-//
-//    TxData[0] = 50;
-//    TxData[1] = 0xAA;
+      // LED Initializationss
+      init_led();
+      set_led(ERROR2, LED_MAX_BRIGHTNESS, LED_RED);    //Set first LED to red
+      set_all_red();
 
-    // LED Initializationss
-    init_led();
-    set_led(ERROR2, LED_MAX_BRIGHTNESS, LED_RED);    //Set first LED to red
-    set_all_red();
+      SDRAM_Init(&hsdram1);
 
-    SDRAM_Init(&hsdram1);
+      static lv_disp_draw_buf_t disp_buf;
+      /*Static or global buffer(s). The second buffer is optional*/
+      static lv_color_t *buf_1 = (lv_color_t *)0xC0000000;
+      static lv_color_t *buf_2 = (lv_color_t *)0xC0000000+480*272*sizeof(lv_color_t)/4;
 
-//    float success_rate = SDRAM_Test(130560 * 4, ram_address);
+      /*Initialize `disp_buf` with the buffer(s) */
+      lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, 480*272);
 
-    /* USER CODE END 2 */
+      lv_disp_drv_t disp_drv;                 /*A variable to hold the drivers. Can be local variable*/
+      lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
+	  disp_drv.draw_buf = &disp_buf;            /*Set an initialized buffer*/
+	  disp_drv.direct_mode = 1;
+	  disp_drv.sw_rotate = 0;
+	  disp_drv.hor_res = 480;
+	  disp_drv.ver_res = 272;
+	  disp_drv.rotated = LV_DISP_ROT_180;
+	  disp_drv.flush_cb = my_flush_cb;
+	  lv_disp_t * disp;
+	  disp = lv_disp_drv_register(&disp_drv);
+  /* USER CODE END 2 */
 
-    /* Infinite loop */
-    /* USER CODE BEGIN WHILE */
-    while (1) {
-        /* USER CODE END WHILE */
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
 
-        /* USER CODE BEGIN 3 */
-//        if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
-//            Error_Handler();
-//        }
-        update_led(&hspi2);
-        HAL_Delay(2);
-    }
-    /* USER CODE END 3 */
+    /* USER CODE BEGIN 3 */
+//	  if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
+//		  Error_Handler();
+//	  }
+	  lv_timer_handler();
+	  update_led(&hspi2);
+	  HAL_Delay(2);
+  }
+  /* USER CODE END 3 */
 }
 
 /**
   * @brief System Clock Configuration
   * @retval None
   */
-void SystemClock_Config(void) {
-    RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-    RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-    /** Configure the main internal regulator output voltage
-    */
-    __HAL_RCC_PWR_CLK_ENABLE();
-    __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
-
-    /** Initializes the RCC Oscillators according to the specified parameters
-    * in the RCC_OscInitTypeDef structure.
-    */
-    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-    RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-    RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-    RCC_OscInitStruct.PLL.PLLM = 8;
-    RCC_OscInitStruct.PLL.PLLN = 216;
-    RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-    RCC_OscInitStruct.PLL.PLLQ = 2;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
-        Error_Handler();
-    }
-
-    /** Activate the Over-Drive mode
-    */
-    if (HAL_PWREx_EnableOverDrive() != HAL_OK) {
-        Error_Handler();
-    }
-
-    /** Initializes the CPU, AHB and APB buses clocks
-    */
-    RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-                                  | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-    RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-    RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-    RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
-    RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
-
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK) {
-        Error_Handler();
-    }
-}
-
-/**
-  * @brief CAN1 Initialization Function
-  * @param None
-  * @retval None
+  /** Configure the main internal regulator output voltage
   */
-static void MX_CAN1_Init(void) {
+  __HAL_RCC_PWR_CLK_ENABLE();
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
-    /* USER CODE BEGIN CAN1_Init 0 */
-
-    /* USER CODE END CAN1_Init 0 */
-
-    /* USER CODE BEGIN CAN1_Init 1 */
-
-    /* USER CODE END CAN1_Init 1 */
-    hcan1.Instance = CAN1;
-    hcan1.Init.Prescaler = 16;
-    hcan1.Init.Mode = CAN_MODE_NORMAL;
-    hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-    hcan1.Init.TimeSeg1 = CAN_BS1_10TQ;
-    hcan1.Init.TimeSeg2 = CAN_BS2_1TQ;
-    hcan1.Init.TimeTriggeredMode = DISABLE;
-    hcan1.Init.AutoBusOff = DISABLE;
-    hcan1.Init.AutoWakeUp = DISABLE;
-    hcan1.Init.AutoRetransmission = ENABLE;
-    hcan1.Init.ReceiveFifoLocked = DISABLE;
-    hcan1.Init.TransmitFifoPriority = DISABLE;
-    if (HAL_CAN_Init(&hcan1) != HAL_OK) {
-        Error_Handler();
-    }
-    /* USER CODE BEGIN CAN1_Init 2 */
-    CAN_FilterTypeDef sFilterConfig;
-
-    sFilterConfig.FilterBank = 0;
-    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0000;
-    sFilterConfig.FilterIdLow = 0x0000;
-    sFilterConfig.FilterMaskIdHigh = 0x0000;
-    sFilterConfig.FilterMaskIdLow = 0x0000;
-    sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
-    sFilterConfig.FilterActivation = ENABLE;
-
-
-    if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
-        Error_Handler();
-    }
-
-
-    if (HAL_CAN_Start(&hcan1) != HAL_OK) {
-        Error_Handler();
-    }
-
-
-    if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {
-        Error_Handler();
-    }
-    /* USER CODE END CAN1_Init 2 */
-
-}
-
-/**
-  * @brief LTDC Initialization Function
-  * @param None
-  * @retval None
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
   */
-static void MX_LTDC_Init(void) {
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 216;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 2;
+  RCC_OscInitStruct.PLL.PLLR = 2;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
 
-    /* USER CODE BEGIN LTDC_Init 0 */
-
-    /* USER CODE END LTDC_Init 0 */
-
-    LTDC_LayerCfgTypeDef pLayerCfg = {0};
-
-    /* USER CODE BEGIN LTDC_Init 1 */
-
-    /* USER CODE END LTDC_Init 1 */
-    hltdc.Instance = LTDC;
-    hltdc.Init.HSPolarity = LTDC_HSPOLARITY_AL;
-    hltdc.Init.VSPolarity = LTDC_VSPOLARITY_AL;
-    hltdc.Init.DEPolarity = LTDC_DEPOLARITY_AH;
-    hltdc.Init.PCPolarity = LTDC_PCPOLARITY_IPC;
-    hltdc.Init.HorizontalSync = 3;
-    hltdc.Init.VerticalSync = 3;
-    hltdc.Init.AccumulatedHBP = 46;
-    hltdc.Init.AccumulatedVBP = 15;
-    hltdc.Init.AccumulatedActiveW = 526;
-    hltdc.Init.AccumulatedActiveH = 287;
-    hltdc.Init.TotalWidth = 534;
-    hltdc.Init.TotalHeigh = 295;
-    hltdc.Init.Backcolor.Blue = 0;
-    hltdc.Init.Backcolor.Green = 0;
-    hltdc.Init.Backcolor.Red = 0;
-    if (HAL_LTDC_Init(&hltdc) != HAL_OK) {
-        Error_Handler();
-    }
-    pLayerCfg.WindowX0 = 0;
-    pLayerCfg.WindowX1 = 480;
-    pLayerCfg.WindowY0 = 0;
-    pLayerCfg.WindowY1 = 272;
-    pLayerCfg.PixelFormat = LTDC_PIXEL_FORMAT_ARGB8888;
-    pLayerCfg.Alpha = 255;
-    pLayerCfg.Alpha0 = 255;
-    pLayerCfg.BlendingFactor1 = LTDC_BLENDING_FACTOR1_CA;
-    pLayerCfg.BlendingFactor2 = LTDC_BLENDING_FACTOR2_CA;
-    pLayerCfg.FBStartAdress = 0xC0000000;
-    pLayerCfg.ImageWidth = 480;
-    pLayerCfg.ImageHeight = 272;
-    pLayerCfg.Backcolor.Blue = 255;
-    pLayerCfg.Backcolor.Green = 255;
-    pLayerCfg.Backcolor.Red = 255;
-    if (HAL_LTDC_ConfigLayer(&hltdc, &pLayerCfg, 0) != HAL_OK) {
-        Error_Handler();
-    }
-    /* USER CODE BEGIN LTDC_Init 2 */
-
-    /* USER CODE END LTDC_Init 2 */
-
-}
-
-/**
-  * @brief SPI2 Initialization Function
-  * @param None
-  * @retval None
+  /** Activate the Over-Drive mode
   */
-static void MX_SPI2_Init(void) {
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
+  {
+    Error_Handler();
+  }
 
-    /* USER CODE BEGIN SPI2_Init 0 */
-
-    /* USER CODE END SPI2_Init 0 */
-
-    /* USER CODE BEGIN SPI2_Init 1 */
-
-    /* USER CODE END SPI2_Init 1 */
-    /* SPI2 parameter configuration*/
-    hspi2.Instance = SPI2;
-    hspi2.Init.Mode = SPI_MODE_MASTER;
-    hspi2.Init.Direction = SPI_DIRECTION_2LINES;
-    hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
-    hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
-    hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
-    hspi2.Init.NSS = SPI_NSS_SOFT;
-    hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
-    hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
-    hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
-    hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-    hspi2.Init.CRCPolynomial = 7;
-    hspi2.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
-    hspi2.Init.NSSPMode = SPI_NSS_PULSE_DISABLE;
-    if (HAL_SPI_Init(&hspi2) != HAL_OK) {
-        Error_Handler();
-    }
-    /* USER CODE BEGIN SPI2_Init 2 */
-
-    /* USER CODE END SPI2_Init 2 */
-
-}
-
-/**
-  * @brief TIM14 Initialization Function
-  * @param None
-  * @retval None
+  /** Initializes the CPU, AHB and APB buses clocks
   */
-static void MX_TIM14_Init(void) {
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-    /* USER CODE BEGIN TIM14_Init 0 */
-
-    /* USER CODE END TIM14_Init 0 */
-
-    TIM_OC_InitTypeDef sConfigOC = {0};
-
-    /* USER CODE BEGIN TIM14_Init 1 */
-
-    /* USER CODE END TIM14_Init 1 */
-    htim14.Instance = TIM14;
-    htim14.Init.Prescaler = 0;
-    htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
-    htim14.Init.Period = 65535;
-    htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-    htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-    if (HAL_TIM_Base_Init(&htim14) != HAL_OK) {
-        Error_Handler();
-    }
-    if (HAL_TIM_PWM_Init(&htim14) != HAL_OK) {
-        Error_Handler();
-    }
-    sConfigOC.OCMode = TIM_OCMODE_PWM1;
-    sConfigOC.Pulse = 0;
-    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-    if (HAL_TIM_PWM_ConfigChannel(&htim14, &sConfigOC, TIM_CHANNEL_1) != HAL_OK) {
-        Error_Handler();
-    }
-    /* USER CODE BEGIN TIM14_Init 2 */
-
-    /* USER CODE END TIM14_Init 2 */
-
-}
-
-/* FMC initialization function */
-static void MX_FMC_Init(void) {
-
-    /* USER CODE BEGIN FMC_Init 0 */
-
-    /* USER CODE END FMC_Init 0 */
-
-    FMC_SDRAM_TimingTypeDef SdramTiming = {0};
-
-    /* USER CODE BEGIN FMC_Init 1 */
-
-    /* USER CODE END FMC_Init 1 */
-
-    /** Perform the SDRAM1 memory initialization sequence
-    */
-    hsdram1.Instance = FMC_SDRAM_DEVICE;
-    /* hsdram1.Init */
-    hsdram1.Init.SDBank = FMC_SDRAM_BANK1;
-    hsdram1.Init.ColumnBitsNumber = FMC_SDRAM_COLUMN_BITS_NUM_9;
-    hsdram1.Init.RowBitsNumber = FMC_SDRAM_ROW_BITS_NUM_13;
-    hsdram1.Init.MemoryDataWidth = FMC_SDRAM_MEM_BUS_WIDTH_16;
-    hsdram1.Init.InternalBankNumber = FMC_SDRAM_INTERN_BANKS_NUM_4;
-    hsdram1.Init.CASLatency = FMC_SDRAM_CAS_LATENCY_3;
-    hsdram1.Init.WriteProtection = FMC_SDRAM_WRITE_PROTECTION_DISABLE;
-    hsdram1.Init.SDClockPeriod = FMC_SDRAM_CLOCK_PERIOD_2;
-    hsdram1.Init.ReadBurst = FMC_SDRAM_RBURST_ENABLE;
-    hsdram1.Init.ReadPipeDelay = FMC_SDRAM_RPIPE_DELAY_1;
-    /* SdramTiming */
-    SdramTiming.LoadToActiveDelay = 2;
-    SdramTiming.ExitSelfRefreshDelay = 8;
-    SdramTiming.SelfRefreshTime = 6;
-    SdramTiming.RowCycleDelay = 7;
-    SdramTiming.WriteRecoveryTime = 5;
-    SdramTiming.RPDelay = 2;
-    SdramTiming.RCDDelay = 2;
-
-    if (HAL_SDRAM_Init(&hsdram1, &SdramTiming) != HAL_OK) {
-        Error_Handler();
-    }
-
-    /* USER CODE BEGIN FMC_Init 2 */
-    /* USER CODE END FMC_Init 2 */
-}
-
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void) {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
-
-    /* GPIO Ports Clock Enable */
-    __HAL_RCC_GPIOE_CLK_ENABLE();
-    __HAL_RCC_GPIOF_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    __HAL_RCC_GPIOG_CLK_ENABLE();
-    __HAL_RCC_GPIOD_CLK_ENABLE();
-
-    /*Configure GPIO pin Output Level */
-    HAL_GPIO_WritePin(RTDS_OUT_GPIO_Port, RTDS_OUT_Pin, GPIO_PIN_RESET);
-
-    /*Configure GPIO pin : RTDS_OUT_Pin */
-    GPIO_InitStruct.Pin = RTDS_OUT_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(RTDS_OUT_GPIO_Port, &GPIO_InitStruct);
-
-    /*Configure GPIO pins : GP1_SIGNAL_Pin GP2_SIGNAL_Pin GP3_SIGNAL_Pin */
-    GPIO_InitStruct.Pin = GP1_SIGNAL_Pin | GP2_SIGNAL_Pin | GP3_SIGNAL_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
-    /*Configure GPIO pins : PF6 PF7 */
-    GPIO_InitStruct.Pin = GPIO_PIN_6 | GPIO_PIN_7;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF9_QUADSPI;
-    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
-    /*Configure GPIO pins : PF8 PF9 */
-    GPIO_InitStruct.Pin = GPIO_PIN_8 | GPIO_PIN_9;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF10_QUADSPI;
-    HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
-
-    /*Configure GPIO pin : PB2 */
-    GPIO_InitStruct.Pin = GPIO_PIN_2;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF9_QUADSPI;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-    /*Configure GPIO pin : PB6 */
-    GPIO_InitStruct.Pin = GPIO_PIN_6;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF10_QUADSPI;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
 /* USER CODE BEGIN 4 */
@@ -524,13 +229,15 @@ static void MX_GPIO_Init(void) {
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
-void Error_Handler(void) {
-    /* USER CODE BEGIN Error_Handler_Debug */
-    /* User can add his own implementation to report the HAL error return state */
-    __disable_irq();
-    while (1) {
-    }
-    /* USER CODE END Error_Handler_Debug */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT

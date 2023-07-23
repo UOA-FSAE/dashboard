@@ -57,14 +57,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define RTDS_OUT_Pin GPIO_PIN_2
-#define RTDS_OUT_GPIO_Port GPIOE
-#define GP1_SIGNAL_Pin GPIO_PIN_3
-#define GP1_SIGNAL_GPIO_Port GPIOE
-#define GP2_SIGNAL_Pin GPIO_PIN_4
-#define GP2_SIGNAL_GPIO_Port GPIOE
-#define GP3_SIGNAL_Pin GPIO_PIN_5
-#define GP3_SIGNAL_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
 
