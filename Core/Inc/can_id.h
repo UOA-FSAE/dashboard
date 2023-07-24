@@ -1,9 +1,5 @@
-//
-// Created by tazukiswift on 29/06/23.
-//
-
-#ifndef DASHBOARD_CAN_CALLBACKS_H
-#define DASHBOARD_CAN_CALLBACKS_H
+#ifndef DASHBOARD_CAN_ID_H
+#define DASHBOARD_CAN_ID_H
 
 #define updateCANFreq               500.0
 
@@ -24,4 +20,4 @@
 #define CAN_ID_FRONT_RIGHT_DRIVE           0x386
 #define CAN_ID_REAR_RIGHT_DRIVE            0x387
 
-#endif //DASHBOARD_CAN_CALLBACKS_H
+#endif //DASHBOARD_CAN_ID_H

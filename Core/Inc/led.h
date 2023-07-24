@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include "main.h"
+#include "vehicle.h"
 
 // struct is 4 bytes with no padding
 typedef struct {
@@ -20,11 +21,13 @@ typedef struct {
 #define LED_NUMBER 19
 #define LED_MAX_BRIGHTNESS 31
 #define LED_MID_BRIGHTNESS 15
+#define LED_MIN_BRIGHTNESS 0
 
 #define LED_RED 255, 0, 0
 #define LED_GREEN 0, 255, 0
 #define LED_YELLOW 255, 180, 0
 #define LED_BLUE 0, 0, 255
+#define LED_OFF 0,0,0
 
 enum led_meaning {
     IMD,
@@ -37,10 +40,10 @@ enum led_meaning {
     TS_ACT,
     READY,
     PDOC,
-    RR,
-    FR,
-    FL,
     RL,
+    FL,
+    FR,
+    RR,
     CTRL1,
     CTRL2,
     INVERTER,
@@ -48,9 +51,8 @@ enum led_meaning {
     KIWI
 };
 
-void init_led();
-
-void update_led(SPI_HandleTypeDef *spi_handle);
+void init_led(Vehicle_Data *ext_vehicle_data, SPI_HandleTypeDef *ext_hspi);
+void update_led();
 
 void set_led(enum led_meaning led_id, uint8_t bright, uint8_t red, uint8_t green, uint8_t blue);
 

@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
 #include "led.h"
 #include "vehicle.h"
 #include "sdram_defines.h"
@@ -78,6 +79,7 @@ static void MX_LTDC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+Vehicle_Data vehicle_data = {0};
 
 /* USER CODE END 0 */
 
@@ -129,9 +131,7 @@ int main(void) {
 //    TxData[1] = 0xAA;
 
     // LED Initializationss
-    init_led();
-    set_led(ERROR2, LED_MAX_BRIGHTNESS, LED_RED);    //Set first LED to red
-    set_all_red();
+    init_led(&vehicle_data,&hspi2);    // Turn LED off, register vehicle_data
 
     SDRAM_Init(&hsdram1);
 
@@ -141,14 +141,13 @@ int main(void) {
 
     /* Infinite loop */
     /* USER CODE BEGIN WHILE */
-    while (1) {
+    while (1) { // "Warning: Endless loop" I'm aware
         /* USER CODE END WHILE */
 
         /* USER CODE BEGIN 3 */
 //        if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
 //            Error_Handler();
 //        }
-        update_led(&hspi2);
         HAL_Delay(2);
     }
     /* USER CODE END 3 */
