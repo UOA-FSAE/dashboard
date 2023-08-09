@@ -18,6 +18,6 @@
 
 void SDRAM_Init(SDRAM_HandleTypeDef *hsdram1);
 
-float SDRAM_Test(long int size_of_ram_in_bytes, uint32_t *ram_address);
+float SDRAM_Test(long int size_of_ram_in_bytes);
 
 #endif //DASHBOARD_SDRAM_FMC_DRV_H

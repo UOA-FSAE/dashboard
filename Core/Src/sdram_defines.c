@@ -40,17 +40,18 @@ void SDRAM_Init(SDRAM_HandleTypeDef *hsdram1) {
     HAL_SDRAM_ProgramRefreshRate(hsdram1, 1668);
 }
 
-float SDRAM_Test(long int size_of_ram_in_bytes, uint32_t *ram_address) {
+float SDRAM_Test(long int size_of_ram_in_bytes) {
+    volatile uint32_t *ram_address = (uint32_t *)0xC0000000;
     long int successes = 0;
     long int blocks_to_test = size_of_ram_in_bytes / 4;
     for (long int i = 0; i < blocks_to_test; i++) {
-        ram_address[i] = 0xFFFFFFFF;
+        ram_address[i] = 0xFFFF00FF;
     }
     for (int i = 0; i < blocks_to_test; i++) {
-        if (ram_address[i] == 0xFFFFFFFF) {
+        if (ram_address[i] == 0xFFFF00FF) {
             successes++;
         }
-        ram_address[i] = 0x00000000;
+//        ram_address[i] = 0x00000000;
     }
     return (double) successes / (double) blocks_to_test;
 }

@@ -31,12 +31,14 @@
 #include "sdram_defines.h"
 #include <stdlib.h>
 #include <string.h>
-#include "/home/tazukiswift/Work/Prog/dashboard/Drivers/lvgl/src/lvgl.h"
+//#include "/home/tazukiswift/Work/Prog/dashboard/Drivers/lvgl/src/lvgl.h"
+#include <lvgl.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+// Global vehicle
+Vehicle_Data the_vehicle = {0};
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -67,8 +69,13 @@ void SystemClock_Config(void);
 // Private local flush buffer function
 void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
-//  HAL_LTDC_SetAddress(&hltdc, (uint32_t)color_p, LTDC_LAYER_1);
-
+	volatile uint32_t *ram_address = (uint32_t *)0xC0000000;
+//	(hltdc.LayerCfg[0]).FBStartAdress = (uint32_t)color_p;
+//  HAL_LTDC_SetAddress_NoReload(&hltdc, (uint32_t)color_p, LTDC_LAYER_1);
+	int width = area->x2 - area->x1+1;
+	for (int i = 0;i<=area->y2-area->y1;i++){
+		memcpy(ram_address+(area->y1+i)*480+area->x1,color_p+width*i,4*width);
+	}
   /* IMPORTANT!!!
   * Inform the graphics library that you are ready with the flushing*/
   lv_disp_flush_ready(disp_drv);
@@ -109,19 +116,7 @@ int main(void)
   MX_LTDC_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-  // Can TX Header
-  //    CAN_TxHeaderTypeDef TxHeader;
-  //    uint8_t TxData[8] = {0};
-  //    uint32_t TxMailbox;
-  //
-  //    TxHeader.IDE = CAN_ID_STD;
-  //    TxHeader.StdId = 0x123;
-  //    TxHeader.RTR = CAN_RTR_DATA;
-  //    TxHeader.DLC = 3;
-  //
-  //    TxData[0] = 50;
-  //    TxData[1] = 0xAA;
-//  	  lv_init();
+  	  lv_init();
 
       // LED Initializationss
       init_led();
@@ -129,44 +124,38 @@ int main(void)
       set_all_red();
 
       SDRAM_Init(&hsdram1);
+      HAL_Delay(10);
 
-//      static lv_disp_draw_buf_t disp_buf;
-////      /*Static or global buffer(s). The second buffer is optional*/
-//      static lv_color_t *buf_1 = (lv_color_t *)0xC0000000;
-//      static lv_color_t *buf_2 = (lv_color_t *)0xC0000000+480*272*sizeof(lv_color_t)/4;
-//
-//      /*Initialize `disp_buf` with the buffer(s) */
-//      lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, 480*272);
-//
-//      lv_disp_drv_t disp_drv;                 /*A variable to hold the drivers. Can be local variable*/
-//      lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
-//	  disp_drv.draw_buf = &disp_buf;            /*Set an initialized buffer*/
-//	  disp_drv.direct_mode = 1;
-//	  disp_drv.sw_rotate = 0;
-//	  disp_drv.hor_res = 480;
-//	  disp_drv.ver_res = 272;
-//	  disp_drv.rotated = LV_DISP_ROT_180;
-//	  disp_drv.flush_cb = my_flush_cb;
-//	  lv_disp_t * disp;
-//	  disp = lv_disp_drv_register(&disp_drv);
-      volatile uint32_t *ram_address = (uint32_t *)0xC0000000;
-      for (int i = 0;i<100;i++) {
-    	  for (int j = 0;j<100;j++) {
-    		  ram_address[480*j + i] = 0xFF00FF00;
-    	  }
-      }
-//
-//	  // Change the active screen's background color
-//	  lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x003a57), LV_PART_MAIN);
-//	  lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
-//
-//	  /*Create a spinner*/
-//	  lv_obj_t * spinner = lv_spinner_create(lv_scr_act(), 1000, 60);
-//	  lv_obj_set_size(spinner, 64, 64);
-//	  lv_obj_align(spinner, LV_ALIGN_BOTTOM_MID, 0, 0);
+      static lv_disp_draw_buf_t disp_buf;
+//      /*Static or global buffer(s). The second buffer is optional*/
+      lv_color_t *buf_1 = malloc(200*200*4);
+      lv_color_t *buf_2 = malloc(200*200*4);
 
+      /*Initialize `disp_buf` with the buffer(s) */
+      lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, 100*100);
 
+      lv_disp_drv_t disp_drv;                 /*A variable to hold the drivers. Can be local variable*/
+      lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
+	  disp_drv.draw_buf = &disp_buf;            /*Set an initialized buffer*/
+	  disp_drv.direct_mode = 0;
+	  disp_drv.sw_rotate = 1;
+	  disp_drv.hor_res = 480;
+	  disp_drv.ver_res = 272;
+	  disp_drv.rotated = LV_DISP_ROT_180;
+	  disp_drv.flush_cb = my_flush_cb;
+	  lv_disp_t * disp;
+	  disp = lv_disp_drv_register(&disp_drv);
 
+	  // Change the active screen's background color
+	  lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x003a57), LV_PART_MAIN);
+	  lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
+
+	  /*Create a spinner*/
+	  lv_obj_t * spinner = lv_spinner_create(lv_scr_act(), 1000, 60);
+	  lv_obj_set_size(spinner, 64, 64);
+	  lv_obj_align(spinner, LV_ALIGN_CENTER, 0, 0);
+
+	  resetDataStructure(&the_vehicle);
 
   /* USER CODE END 2 */
 
@@ -177,10 +166,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
-//		  Error_Handler();
-//	  }
-
 	  lv_timer_handler();
 	  update_led(&hspi2);
 	  HAL_Delay(2);
