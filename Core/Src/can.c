@@ -149,4 +149,22 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 
 /* USER CODE BEGIN 1 */
 
+HAL_StatusTypeDef send_can_message(int std_id, uint8_t *buffer, int length) {
+	  CAN_TxHeaderTypeDef TxHeader;
+	  uint8_t TxData[8] = {0};
+	  uint32_t TxMailbox;
+
+	  TxHeader.IDE = CAN_ID_STD;
+	  TxHeader.StdId = std_id;
+	  TxHeader.RTR = CAN_RTR_DATA;
+	  TxHeader.DLC = length;
+
+	  if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox) != HAL_OK) {
+		  Error_Handler();
+		  return HAL_ERROR;
+	  } else {
+		  return HAL_OK;
+	  }
+}
+
 /* USER CODE END 1 */
