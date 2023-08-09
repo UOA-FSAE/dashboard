@@ -23,7 +23,7 @@ void set_led(enum led_meaning led_id, uint8_t bright, uint8_t red, uint8_t green
 
 void set_all_red() {
     for (int selected_led = 0; selected_led < LED_NUMBER; selected_led++) {
-        set_led((enum led_meaning) selected_led, 1, LED_RED);
+        set_led((enum led_meaning) selected_led, LED_RED);
     }
 }
 

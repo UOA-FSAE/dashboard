@@ -21,10 +21,11 @@ typedef struct {
 #define LED_MAX_BRIGHTNESS 31
 #define LED_MID_BRIGHTNESS 15
 
-#define LED_RED 255, 0, 0
-#define LED_GREEN 0, 255, 0
-#define LED_YELLOW 255, 180, 0
-#define LED_BLUE 0, 0, 255
+#define LED_RED 2, 255, 0, 0
+#define LED_GREEN 2, 0, 255, 0
+#define LED_YELLOW 2, 255, 180, 0
+#define LED_BLUE 2, 0, 0, 255
+#define LED_BLACK 2, 0, 0, 0
 
 enum led_meaning {
     IMD,

@@ -21,6 +21,7 @@
 #include "can.h"
 #include "ltdc.h"
 #include "spi.h"
+#include "tim.h"
 #include "gpio.h"
 #include "fmc.h"
 
@@ -115,12 +116,12 @@ int main(void)
   MX_FMC_Init();
   MX_LTDC_Init();
   MX_SPI2_Init();
+  MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
   	  lv_init();
 
       // LED Initializationss
       init_led();
-      set_led(ERROR2, LED_MAX_BRIGHTNESS, LED_RED);    //Set first LED to red
       set_all_red();
 
       SDRAM_Init(&hsdram1);
@@ -155,6 +156,7 @@ int main(void)
 	  lv_obj_set_size(spinner, 64, 64);
 	  lv_obj_align(spinner, LV_ALIGN_CENTER, 0, 0);
 
+	  HAL_TIM_Base_Start_IT(&htim14);
 	  resetDataStructure(&the_vehicle);
 
   /* USER CODE END 2 */
@@ -167,7 +169,6 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  lv_timer_handler();
-	  update_led(&hspi2);
 	  HAL_Delay(2);
   }
   /* USER CODE END 3 */
@@ -228,6 +229,16 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+// Trigger LEDs
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  // Check which version of the timer triggered this callback and toggle LED
+  if (htim == &htim14)
+  {
+	  update_led(&hspi2);
+  }
+}
 
 /* USER CODE END 4 */
 
