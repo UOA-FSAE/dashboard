@@ -13,6 +13,9 @@ Debug/
 Release/
 .idea/
 
+# STMIDE
+.settings/
+
 # Precompiled Headers
 *.gch
 *.pch
