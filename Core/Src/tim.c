@@ -25,6 +25,7 @@
 #include "spi.h"
 #include "led.h"
 #include "vehicle.h"
+#include "screens.h"
 
 extern Vehicle_Data the_vehicle;
 
@@ -45,7 +46,7 @@ void MX_TIM13_Init(void)
 
   /* USER CODE END TIM13_Init 1 */
   htim13.Instance = TIM13;
-  htim13.Init.Prescaler = 30000;
+  htim13.Init.Prescaler = 3102;
   htim13.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim13.Init.Period = 65535;
   htim13.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -71,7 +72,7 @@ void MX_TIM14_Init(void)
 
   /* USER CODE END TIM14_Init 1 */
   htim14.Instance = TIM14;
-  htim14.Init.Prescaler = 1000;
+  htim14.Init.Prescaler = 500;
   htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim14.Init.Period = 65535;
   htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -163,8 +164,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  update_led(&hspi2);
   } else if (htim == &htim13) // Timer 13 is for testing, operates at 0.33 Hz
   {
-	  the_vehicle.glv.voltage = the_vehicle.glv.voltage+1;
-	  the_vehicle.glv.soc = the_vehicle.glv.soc+1;
+	  cycle_screens();
   }
 }
 /* USER CODE END 1 */

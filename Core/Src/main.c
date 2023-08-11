@@ -32,8 +32,8 @@
 #include "sdram_defines.h"
 #include <stdlib.h>
 #include <string.h>
-//#include "/home/tazukiswift/Work/Prog/dashboard/Drivers/lvgl/src/lvgl.h"
 #include <lvgl.h>
+#include "screens.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -148,37 +148,10 @@ int main(void)
 	  lv_disp_t * disp;
 	  disp = lv_disp_drv_register(&disp_drv);
 
-	  // Create screens
-	  lv_obj_t * driver_screen = lv_obj_create(NULL);
-	  lv_scr_load(driver_screen);
-
-	  lv_obj_set_style_bg_color(lv_scr_act(), lv_color_hex(0x003a57), LV_PART_MAIN);
-	  lv_obj_set_style_text_color(lv_scr_act(), lv_color_hex(0xffffff), LV_PART_MAIN);
-
-	  // Create the famous debug spinner
-	  lv_obj_t * spinner = lv_spinner_create(lv_scr_act(), 1000, 60);
-	  lv_obj_set_size(spinner, 64, 64);
-	  lv_obj_align(spinner, LV_ALIGN_BOTTOM_MID, 0, 0);
-
-	  // Some labels
-	  lv_obj_t * ds_glv_voltage = lv_label_create(lv_scr_act());
-	  lv_label_set_text_fmt(ds_glv_voltage, "GLV Voltage: %.3f V", the_vehicle.glv.voltage);
-	  lv_obj_set_style_text_align(ds_glv_voltage, LV_ALIGN_TOP_MID,0);
-	  lv_obj_align(ds_glv_voltage, LV_ALIGN_CENTER, 0, 10);
-
-
-	  lv_obj_t * ds_glv_soc = lv_label_create(lv_scr_act());
-	  lv_label_set_text_fmt(ds_glv_soc, "GLV SOC: %d%%", the_vehicle.glv.soc);
-	  lv_obj_set_style_text_align(ds_glv_soc, LV_ALIGN_TOP_MID,0);
-	  lv_obj_align(ds_glv_soc, LV_ALIGN_CENTER, 0, -10);
-
-//	  lv_scr_load(driver_screen);
-
-//	  lv_obj_t * debug_screen = lv_obj_create(NULL);
-//	  lv_obj_set_style_bg_color(debug_screen, lv_color_hex(0x003a57), LV_PART_MAIN);
-//	  lv_obj_set_style_text_color(debug_screen, lv_color_hex(0xffffff), LV_PART_MAIN);
+	  init_screens();
 
 	  HAL_TIM_Base_Start_IT(&htim14);
+	  HAL_TIM_Base_Start_IT(&htim13);
 
   /* USER CODE END 2 */
 
@@ -189,12 +162,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  // TODO: do this on a timer
-	  lv_label_set_text_fmt(ds_glv_voltage, "GLV Voltage: %2.3f V", 0.f);
-	  lv_label_set_text_fmt(ds_glv_soc, " SOC: %d%%", the_vehicle.glv.soc);
-	  lv_timer_handler();
 
-	  HAL_Delay(2);
+	  lv_timer_handler();
+	  update_screen();
+//	  HAL_Delay(2);
+
   }
   /* USER CODE END 3 */
 }
