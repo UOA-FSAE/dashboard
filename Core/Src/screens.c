@@ -45,7 +45,7 @@ void init_screens() {
 	ds_glv_soc = lv_label_create(driver_screen);
 	lv_label_set_text_fmt(ds_glv_soc, "SOC: %d%%", the_vehicle.glv.soc);
 	lv_obj_set_style_text_align(ds_glv_soc, LV_ALIGN_TOP_MID,0);
-	lv_obj_align(ds_glv_soc, LV_ALIGN_CENTER, 0, -10);
+	lv_obj_align(ds_glv_soc, LV_ALIGN_CENTER, 0, 20);
 
 	//////////////////
 	// Debug Screen //
@@ -65,7 +65,7 @@ void init_screens() {
 	dbs_rpm = lv_label_create(debug_screen);
 	lv_label_set_text_fmt(dbs_rpm, "SOC: %d rpm", the_vehicle.driver.rpm);
 	lv_obj_set_style_text_align(dbs_rpm, LV_ALIGN_TOP_LEFT,0);
-	lv_obj_align(dbs_rpm, LV_ALIGN_TOP_LEFT, 0, -10);
+	lv_obj_align(dbs_rpm, LV_ALIGN_TOP_LEFT, 0, 20);
 }
 
 void update_screen() {
@@ -76,6 +76,11 @@ void update_screen() {
 		lv_label_set_text_fmt(ds_glv_soc, "SOC: %d%%", the_vehicle.glv.soc);
 	} else if (lv_scr_act() == debug_screen) {
 		// Update Debug Screen
+		lv_obj_set_style_text_align(dbs_throttle, LV_ALIGN_TOP_LEFT,0);
+		lv_obj_align(dbs_throttle, LV_ALIGN_TOP_LEFT, 0, 10);
+
+		lv_obj_set_style_text_align(dbs_rpm, LV_ALIGN_TOP_LEFT,0);
+		lv_obj_align(dbs_rpm, LV_ALIGN_TOP_LEFT, 0, 20);
 	}
 }
 
@@ -88,10 +93,10 @@ void change_screens(enum SCREENS screen) {
 	current_screen = screen;
 	switch(screen) {
 	case DRIVER_SCREEN:
-		lv_scr_load_anim(driver_screen,LV_SCR_LOAD_ANIM_OVER_LEFT,500,0,false);
+		lv_scr_load(driver_screen);
 		break;
 	case DEBUG_SCREEN:
-		lv_scr_load_anim(debug_screen,LV_SCR_LOAD_ANIM_OVER_LEFT,500,0,false);
+		lv_scr_load(debug_screen);
 		break;
 	}
 }
