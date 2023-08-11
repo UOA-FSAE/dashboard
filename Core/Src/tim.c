@@ -22,10 +22,43 @@
 
 /* USER CODE BEGIN 0 */
 
+#include "spi.h"
+#include "led.h"
+#include "vehicle.h"
+
+extern Vehicle_Data the_vehicle;
+
 /* USER CODE END 0 */
 
+TIM_HandleTypeDef htim13;
 TIM_HandleTypeDef htim14;
 
+/* TIM13 init function */
+void MX_TIM13_Init(void)
+{
+
+  /* USER CODE BEGIN TIM13_Init 0 */
+
+  /* USER CODE END TIM13_Init 0 */
+
+  /* USER CODE BEGIN TIM13_Init 1 */
+
+  /* USER CODE END TIM13_Init 1 */
+  htim13.Instance = TIM13;
+  htim13.Init.Prescaler = 30000;
+  htim13.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim13.Init.Period = 65535;
+  htim13.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim13.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim13) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM13_Init 2 */
+
+  /* USER CODE END TIM13_Init 2 */
+
+}
 /* TIM14 init function */
 void MX_TIM14_Init(void)
 {
@@ -56,7 +89,22 @@ void MX_TIM14_Init(void)
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 {
 
-  if(tim_baseHandle->Instance==TIM14)
+  if(tim_baseHandle->Instance==TIM13)
+  {
+  /* USER CODE BEGIN TIM13_MspInit 0 */
+
+  /* USER CODE END TIM13_MspInit 0 */
+    /* TIM13 clock enable */
+    __HAL_RCC_TIM13_CLK_ENABLE();
+
+    /* TIM13 interrupt Init */
+    HAL_NVIC_SetPriority(TIM8_UP_TIM13_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(TIM8_UP_TIM13_IRQn);
+  /* USER CODE BEGIN TIM13_MspInit 1 */
+
+  /* USER CODE END TIM13_MspInit 1 */
+  }
+  else if(tim_baseHandle->Instance==TIM14)
   {
   /* USER CODE BEGIN TIM14_MspInit 0 */
 
@@ -76,7 +124,21 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* tim_baseHandle)
 void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 {
 
-  if(tim_baseHandle->Instance==TIM14)
+  if(tim_baseHandle->Instance==TIM13)
+  {
+  /* USER CODE BEGIN TIM13_MspDeInit 0 */
+
+  /* USER CODE END TIM13_MspDeInit 0 */
+    /* Peripheral clock disable */
+    __HAL_RCC_TIM13_CLK_DISABLE();
+
+    /* TIM13 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(TIM8_UP_TIM13_IRQn);
+  /* USER CODE BEGIN TIM13_MspDeInit 1 */
+
+  /* USER CODE END TIM13_MspDeInit 1 */
+  }
+  else if(tim_baseHandle->Instance==TIM14)
   {
   /* USER CODE BEGIN TIM14_MspDeInit 0 */
 
@@ -93,5 +155,16 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 }
 
 /* USER CODE BEGIN 1 */
-
+// Trigger LEDs
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  if (htim == &htim14)	// Timer 14 is for updating LEDs
+  {
+	  update_led(&hspi2);
+  } else if (htim == &htim13) // Timer 13 is for testing, operates at 0.33 Hz
+  {
+	  the_vehicle.glv.voltage = the_vehicle.glv.voltage+1;
+	  the_vehicle.glv.soc = the_vehicle.glv.soc+1;
+  }
+}
 /* USER CODE END 1 */
