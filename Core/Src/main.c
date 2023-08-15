@@ -160,8 +160,8 @@ int main(void)
 
 	  init_screens();
 
-//	  HAL_TIM_Base_Start_IT(&htim14);
-	  HAL_TIM_Base_Start_IT(&htim13);
+	  HAL_TIM_Base_Start_IT(&htim14);
+//	  HAL_TIM_Base_Start_IT(&htim13);
 
   /* USER CODE END 2 */
 
