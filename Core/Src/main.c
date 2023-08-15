@@ -172,9 +172,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
+    // TODO: Move to timer
+      update_screen();
 	  lv_timer_handler();
-	  update_screen();
 	  HAL_Delay(2);
 
   }

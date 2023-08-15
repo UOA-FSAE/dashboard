@@ -13,9 +13,8 @@ enum SCREENS current_screen;
 // Create screens
 // Driver Screen and Objects
 lv_obj_t *driver_screen;
-lv_obj_t *spinner;
-lv_obj_t *ds_glv_voltage;
-lv_obj_t *ds_glv_soc;
+lv_obj_t * rpm_arc;
+lv_obj_t * throttle_arc;
 
 lv_obj_t *dbs_battery_voltage;
 lv_obj_t *dbs_steering_position;
@@ -36,36 +35,56 @@ lv_obj_t *dbs_inverter_loop_coolant_temp;
 // Debug Screen and Objects
 lv_obj_t *debug_screen;
 
+uint32_t column_line_counter = 1;
+
+#define FAKE_ROTATED 1
+
+void init_obj_at_point(lv_obj_t * obj, lv_align_t alignment, int x_ofs, int y_ofs) {
+#ifdef FAKE_ROTATED
+    lv_obj_set_style_text_align(obj, alignment, 0);
+    lv_obj_align(obj, alignment, 480-x_ofs, 272-y_ofs);
+    lv_obj_set_style_transform_angle(obj,1800,0);
+#else
+    lv_obj_set_style_text_align(obj, alignment, 0);
+    lv_obj_align(obj, alignment, x_ofs, y_ofs);
+#endif
+}
+
 void init_screens() {
     // Driver Screen
     driver_screen = lv_obj_create(NULL);
+    lv_scr_load(driver_screen);
+    current_screen = DRIVER_SCREEN;
 
     lv_obj_set_style_bg_color(driver_screen, lv_color_hex(0x003a57), LV_PART_MAIN);
     lv_obj_set_style_text_color(driver_screen, lv_color_hex(0xffffff), LV_PART_MAIN);
 
-    spinner = lv_spinner_create(driver_screen, 1000, 60);
-    lv_obj_set_size(spinner, 64, 64);
-    lv_obj_align(spinner, LV_ALIGN_BOTTOM_MID, 0, 0);
-
-    // Labels
-    ds_glv_voltage = lv_label_create(driver_screen);
-    lv_label_set_text_fmt(ds_glv_voltage, "GLV Voltage: %.3f V", the_vehicle.glv.voltage);
-    lv_obj_set_style_text_align(ds_glv_voltage, LV_ALIGN_TOP_MID, 0);
-    lv_obj_align(ds_glv_voltage, LV_ALIGN_CENTER, 0, 10);
 
 
-    ds_glv_soc = lv_label_create(driver_screen);
-    lv_label_set_text_fmt(ds_glv_soc, "SOC: %d%%", the_vehicle.glv.soc);
-    lv_obj_set_style_text_align(ds_glv_soc, LV_ALIGN_TOP_MID, 0);
-    lv_obj_align(ds_glv_soc, LV_ALIGN_CENTER, 0, 20);
+    rpm_arc = lv_arc_create(driver_screen);
+    lv_arc_set_bg_angles(rpm_arc, 150, 30);
+    lv_arc_set_angles(rpm_arc, 150, 150+70);
+    lv_obj_set_size(rpm_arc, 150, 150);
+    lv_obj_remove_style(rpm_arc, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
+    lv_obj_clear_flag(rpm_arc, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
+    lv_obj_align(rpm_arc, LV_ALIGN_LEFT_MID, 40, 0);
+    lv_obj_set_style_arc_color(rpm_arc,lv_palette_main(LV_PALETTE_DEEP_ORANGE),LV_PART_INDICATOR);
+
+    throttle_arc = lv_arc_create(driver_screen);
+    lv_arc_set_bg_angles(throttle_arc, 150, 30);
+    lv_arc_set_angles(throttle_arc, 150, 150+70);
+    lv_obj_set_size(throttle_arc, 150, 150);
+    lv_obj_remove_style(throttle_arc, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
+    lv_obj_clear_flag(throttle_arc, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
+    lv_obj_align(throttle_arc, LV_ALIGN_RIGHT_MID, -40, 0);
+    lv_obj_set_style_arc_color(throttle_arc,lv_palette_main(LV_PALETTE_DEEP_ORANGE),LV_PART_INDICATOR);
+
 
     //////////////////
     // Debug Screen //
     //////////////////
 
     debug_screen = lv_obj_create(NULL);
-    lv_scr_load(debug_screen);
-    current_screen = DEBUG_SCREEN;
     lv_obj_set_style_bg_color(debug_screen, lv_color_hex(0x003a57), LV_PART_MAIN);
     lv_obj_set_style_text_color(debug_screen, lv_color_hex(0xffffff), LV_PART_MAIN);
 
@@ -166,8 +185,7 @@ void update_screen() {
 
     if (lv_scr_act() == driver_screen) {
         // Update Driver Screen
-        lv_label_set_text_fmt(ds_glv_voltage, "GLV Voltage: %.3f V", the_vehicle.glv.voltage);
-        lv_label_set_text_fmt(ds_glv_soc, "SOC: %d%%", the_vehicle.glv.soc);
+
     } else if (lv_scr_act() == debug_screen) {
         // Update Debug Screen
         lv_label_set_text_fmt(dbs_battery_voltage, "GLV Voltage: %.2fV", the_vehicle.glv.voltage);
