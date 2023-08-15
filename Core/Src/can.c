@@ -24,6 +24,7 @@
 #include "can_ids.h"
 #include "vehicle.h"
 #include "led.h"
+#include "screens.h"
 
 extern Vehicle_Data the_vehicle;
 /* USER CODE END 0 */
@@ -361,6 +362,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 				set_led(RL,LED_GREEN);
 			}
 			break;
+        case CAN_ID_VGPIO:
+            cycle_screens();
+            break;
     }
 }
 
