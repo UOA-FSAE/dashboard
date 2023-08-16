@@ -39,11 +39,13 @@ volatile lv_color_t buf_2[100*100];
 lv_obj_t *driver_screen;
 
 // Debug screen styles
-static lv_style_t speedometer_foreground_style;
-static lv_style_t speedometer_background_style;
+static lv_style_t speedometer_style;
+static lv_style_t colored_label_style;
 
 lv_obj_t * rpm_arc;
 lv_obj_t * throttle_arc;
+lv_obj_t * rpm_label;
+lv_obj_t * throttle_label;
 
 // Debug Screen and Objects
 lv_obj_t *debug_screen;
@@ -134,34 +136,55 @@ void init_screens() {
     lv_obj_set_style_text_color(driver_screen, lv_color_hex(0xffffff), LV_PART_MAIN);
 
     // Speedometer foreground style
-    lv_style_init(&speedometer_foreground_style);
-    lv_style_set_arc_rounded(&speedometer_foreground_style,false);
-    lv_style_set_arc_color(&speedometer_foreground_style,lv_palette_main(LV_PALETTE_DEEP_ORANGE));
-    lv_style_set_arc_width(&speedometer_foreground_style,40);
+    lv_style_init(&speedometer_style);
+    lv_style_set_arc_rounded(&speedometer_style,false);
+    lv_style_set_arc_width(&speedometer_style,40);
 
-    lv_style_init(&speedometer_background_style);
-    lv_style_set_arc_rounded(&speedometer_background_style,false);
-    lv_style_set_arc_width(&speedometer_background_style,40);
+    lv_style_init(&speedometer_style);
+    lv_style_set_arc_rounded(&speedometer_style,false);
+    lv_style_set_arc_width(&speedometer_style,40);
+
+    // Colored Label Style Init
+    lv_style_init(&colored_label_style);
+    lv_style_set_text_align(&colored_label_style,LV_ALIGN_TOP_LEFT);
+    lv_style_set_radius(&colored_label_style,5);
+    lv_style_set_pad_all(&colored_label_style,10);
+    lv_style_set_bg_opa(&colored_label_style,LV_OPA_COVER);
 
 
+
+    // RPM Label
+    rpm_label = lv_label_create(driver_screen);
+    lv_obj_align(rpm_label, LV_ALIGN_TOP_LEFT, 76, 136+50);
+    lv_obj_set_style_bg_color(rpm_label,lv_palette_main(LV_PALETTE_GREEN),LV_PART_MAIN);
+    lv_obj_add_style(rpm_label,&colored_label_style,LV_PART_MAIN);
+
+    // THROTTLE Label
+    throttle_label = lv_label_create(driver_screen);
+    lv_obj_align(throttle_label, LV_ALIGN_TOP_LEFT, 50+240, 136+50);
+    lv_obj_set_style_bg_color(throttle_label,lv_palette_main(LV_PALETTE_GREEN),LV_PART_MAIN);
+    lv_obj_add_style(throttle_label,&colored_label_style,LV_PART_MAIN);
+
+    // RPM Arc
     rpm_arc = lv_arc_create(driver_screen);
     lv_arc_set_bg_angles(rpm_arc, 150, 30);
-    lv_arc_set_angles(rpm_arc, 150, 150+70);
     lv_obj_set_size(rpm_arc, 180, 180);
 
-    lv_obj_add_style(rpm_arc,&speedometer_foreground_style,LV_PART_INDICATOR);
-    lv_obj_add_style(rpm_arc,&speedometer_background_style,LV_PART_MAIN);
+    lv_obj_add_style(rpm_arc,&speedometer_style,LV_PART_INDICATOR);
+    lv_obj_add_style(rpm_arc,&speedometer_style,LV_PART_MAIN);
+    lv_obj_set_style_arc_color(rpm_arc,lv_palette_main(LV_PALETTE_DEEP_ORANGE),LV_PART_INDICATOR);
     lv_obj_remove_style(rpm_arc, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
     lv_obj_clear_flag(rpm_arc, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
     lv_obj_align(rpm_arc, LV_ALIGN_LEFT_MID, 40, 0);
 
+    // THROTTLE Arc
     throttle_arc = lv_arc_create(driver_screen);
     lv_arc_set_bg_angles(throttle_arc, 150, 30);
-    lv_arc_set_angles(throttle_arc, 150, 150+70);
     lv_obj_set_size(throttle_arc, 180, 180);
 
-    lv_obj_add_style(throttle_arc,&speedometer_foreground_style,LV_PART_INDICATOR);
-    lv_obj_add_style(throttle_arc,&speedometer_background_style,LV_PART_MAIN);
+    lv_obj_add_style(throttle_arc,&speedometer_style,LV_PART_INDICATOR);
+    lv_obj_add_style(throttle_arc,&speedometer_style,LV_PART_MAIN);
+    lv_obj_set_style_arc_color(throttle_arc,lv_palette_main(LV_PALETTE_DEEP_PURPLE),LV_PART_INDICATOR);
     lv_obj_remove_style(throttle_arc, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
     lv_obj_clear_flag(throttle_arc, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
     lv_obj_align(throttle_arc, LV_ALIGN_RIGHT_MID, -40, 0);
@@ -273,6 +296,10 @@ void try_update_screen() {
     screen_update_flag = 0;
     if (lv_scr_act() == driver_screen) {
         // Update Driver Screen
+        lv_label_set_text_fmt(throttle_label, "Throttle: %d %%", the_vehicle.driver.throttle);
+        lv_label_set_text_fmt(rpm_label, "RPM: %d", the_vehicle.driver.rpm);
+        lv_arc_set_angles(rpm_arc, 150, 150+(240*(int)the_vehicle.driver.rpm/20000));
+        lv_arc_set_angles(throttle_arc, 150, 150+(240*(int)the_vehicle.driver.throttle)/100);
 
     } else if (lv_scr_act() == debug_screen) {
         // Update Debug Screen

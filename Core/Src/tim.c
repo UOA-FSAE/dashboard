@@ -175,12 +175,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
       // Queue an update for the LEDS
 	  update_led(&hspi2);
 
+      // Update vehicle arbitrarily?
+      the_vehicle.driver.rpm = (the_vehicle.driver.rpm + 1000)%20000;
+      the_vehicle.driver.throttle = (the_vehicle.driver.throttle + 10)%100;
+
       // Queue an update for the screen
       update_screen();
   } else if (htim == &htim13) // Timer 13 is for testing, operates at 0.33 Hz
   {
         // Queue a cycle for the screen
-        cycle_screens();
+//        cycle_screens();
   }
 }
 /* USER CODE END 1 */
