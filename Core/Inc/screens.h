@@ -13,11 +13,11 @@ void init_displays();
 // CALL THIS SECOND
 void init_screens();
 
+void try_update_screen();
+
 void update_screen();
 
-void change_screens(enum SCREENS screen);
-
-void try_switch_screens();
+void try_cycle_screens();
 
 void cycle_screens();
 

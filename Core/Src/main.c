@@ -129,8 +129,8 @@ int main(void)
     /* USER CODE BEGIN 3 */
       lv_timer_handler();
 
-      update_screen();
-      try_switch_screens();
+      try_update_screen();
+      try_cycle_screens();
 
 	  HAL_Delay(2);
 

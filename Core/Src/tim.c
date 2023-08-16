@@ -27,7 +27,7 @@
 #include "vehicle.h"
 #include "screens.h"
 
-extern Vehicle_Data the_vehicle;
+extern volatile Vehicle_Data the_vehicle;
 
 /* USER CODE END 0 */
 
@@ -72,7 +72,7 @@ void MX_TIM14_Init(void)
 
   /* USER CODE END TIM14_Init 1 */
   htim14.Instance = TIM14;
-  htim14.Init.Prescaler = 500;
+  htim14.Init.Prescaler = 800;
   htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim14.Init.Period = 65535;
   htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -162,9 +162,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   if (htim == &htim14)	// Timer 14 is for updating LEDs
   {
 	  update_led(&hspi2);
+      update_screen();
   } else if (htim == &htim13) // Timer 13 is for testing, operates at 0.33 Hz
   {
-      // TODO: make timer faster?
     cycle_screens();
   }
 }

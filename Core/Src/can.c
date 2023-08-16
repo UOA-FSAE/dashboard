@@ -26,7 +26,7 @@
 #include "led.h"
 #include "screens.h"
 
-extern Vehicle_Data the_vehicle;
+extern volatile Vehicle_Data the_vehicle;
 /* USER CODE END 0 */
 
 CAN_HandleTypeDef hcan1;

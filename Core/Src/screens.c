@@ -3,7 +3,7 @@
 #include <vehicle.h>
 #include <ltdc.h>
 
-extern Vehicle_Data the_vehicle;
+extern volatile Vehicle_Data the_vehicle;
 
 #define LINE_HEIGHT 14
 #define LEFT_COLUMN_TAB 5
@@ -16,6 +16,7 @@ extern Vehicle_Data the_vehicle;
 enum SCREENS current_screen;
 
 static volatile uint8_t screen_switch_flag = 0;
+static volatile uint8_t screen_update_flag = 0;
 
 // Display Driver
 static lv_disp_draw_buf_t the_display_buf;
@@ -267,8 +268,9 @@ void init_screens() {
     lv_obj_align(dbs_inverter_loop_coolant_temp, LV_ALIGN_TOP_LEFT, 240, 6 * LINE_HEIGHT);
 }
 
-void update_screen() {
-
+void try_update_screen() {
+    if (!screen_update_flag) return;
+    screen_update_flag = 0;
     if (lv_scr_act() == driver_screen) {
         // Update Driver Screen
 
@@ -298,16 +300,8 @@ void update_screen() {
     }
 }
 
-void cycle_screens() {
-    screen_switch_flag = 1;
-}
-
-void try_switch_screens() {
-    if (screen_switch_flag){
-        screen_switch_flag = 0;
-        current_screen = (current_screen + 1) % 2;
-        change_screens(current_screen);
-    }
+void update_screen() {
+    screen_update_flag = 1;
 }
 
 void change_screens(enum SCREENS screen) {
@@ -322,4 +316,15 @@ void change_screens(enum SCREENS screen) {
     }
 }
 
+void cycle_screens() {
+    screen_switch_flag = 1;
+}
+
+void try_cycle_screens() {
+    if (screen_switch_flag){
+        screen_switch_flag = 0;
+        current_screen = (current_screen + 1) % 2;
+        change_screens(current_screen);
+    }
+}
 
