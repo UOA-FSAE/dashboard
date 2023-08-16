@@ -176,8 +176,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	  update_led(&hspi2);
 
       // Update vehicle arbitrarily?
-      the_vehicle.driver.rpm = (the_vehicle.driver.rpm + 1000)%20000;
-      the_vehicle.driver.throttle = (the_vehicle.driver.throttle + 10)%100;
+//      the_vehicle.driver.rpm = (the_vehicle.driver.rpm + 1000)%20000;
+//      the_vehicle.driver.throttle = (the_vehicle.driver.throttle + 10)%100;
 
       // Queue an update for the screen
       update_screen();
