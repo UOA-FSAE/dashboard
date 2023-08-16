@@ -41,6 +41,7 @@ extern CAN_HandleTypeDef hcan1;
 void MX_CAN1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+void send_can_message(int std_id, uint8_t *buffer, int length);
 
 /* USER CODE END Prototypes */
 

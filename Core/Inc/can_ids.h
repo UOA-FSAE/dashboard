@@ -19,7 +19,7 @@
 #define CAN_ID_RACE_DATA                   0x604
 #define CAN_ID_DRIVER_DATA                 0x605
 
-#define CAN_ID_VGPIO                       0x610
+#define CAN_ID_VGPIO_DASHBOARD             0x610
 
 #define CAN_ID_REAR_LEFT_DRIVE             0x384
 #define CAN_ID_FRONT_LEFT_DRIVE            0x385

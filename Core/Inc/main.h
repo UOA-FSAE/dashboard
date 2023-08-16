@@ -57,6 +57,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define RTDS_Pin GPIO_PIN_2
+#define RTDS_GPIO_Port GPIOE
+#define BUTTON_1_Pin GPIO_PIN_3
+#define BUTTON_1_GPIO_Port GPIOE
+#define BUTTON_2_Pin GPIO_PIN_4
+#define BUTTON_2_GPIO_Port GPIOE
+#define BUTTON_3_Pin GPIO_PIN_5
+#define BUTTON_3_GPIO_Port GPIOE
 
 /* USER CODE BEGIN Private defines */
 

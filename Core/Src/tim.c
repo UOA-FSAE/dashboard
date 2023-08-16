@@ -26,8 +26,12 @@
 #include "led.h"
 #include "vehicle.h"
 #include "screens.h"
+#include "can.h"
+#include "can_ids.h"
 
 extern volatile Vehicle_Data the_vehicle;
+
+volatile uint8_t vgpio_can_register = 0;
 
 /* USER CODE END 0 */
 
@@ -161,11 +165,22 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim == &htim14)	// Timer 14 is for updating LEDs
   {
+      // Transmit CAN Message to state the status of the GPIO Pins
+      // TODO: This should be triggered on interrupt
+      vgpio_can_register =  ( (0b00000001 & HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_3))
+                            | (0b00000010 & HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_4))
+                            | (0b00000100 & HAL_GPIO_ReadPin(GPIOE,GPIO_PIN_5)));
+      send_can_message(CAN_ID_VGPIO_DASHBOARD,&vgpio_can_register,1);
+
+      // Queue an update for the LEDS
 	  update_led(&hspi2);
+
+      // Queue an update for the screen
       update_screen();
   } else if (htim == &htim13) // Timer 13 is for testing, operates at 0.33 Hz
   {
-    cycle_screens();
+        // Queue a cycle for the screen
+        cycle_screens();
   }
 }
 /* USER CODE END 1 */
