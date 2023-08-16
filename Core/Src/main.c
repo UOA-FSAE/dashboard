@@ -39,7 +39,7 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 // Global vehicle
-Vehicle_Data the_vehicle = {0};
+volatile Vehicle_Data the_vehicle = {0};
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -116,7 +116,7 @@ int main(void)
 	  init_screens();
 
 	  HAL_TIM_Base_Start_IT(&htim14);
-//	  HAL_TIM_Base_Start_IT(&htim13);
+	  HAL_TIM_Base_Start_IT(&htim13);
 
   /* USER CODE END 2 */
 
@@ -127,9 +127,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    // TODO: Move to timer
+      lv_timer_handler();
+
       update_screen();
-	  lv_timer_handler();
+      try_switch_screens();
+
 	  HAL_Delay(2);
 
   }

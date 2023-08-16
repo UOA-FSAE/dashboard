@@ -165,7 +165,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   } else if (htim == &htim13) // Timer 13 is for testing, operates at 0.33 Hz
   {
       // TODO: make timer faster?
-
+    cycle_screens();
   }
 }
 /* USER CODE END 1 */

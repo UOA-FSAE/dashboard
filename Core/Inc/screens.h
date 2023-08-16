@@ -17,6 +17,8 @@ void update_screen();
 
 void change_screens(enum SCREENS screen);
 
+void try_switch_screens();
+
 void cycle_screens();
 
 #endif /* INC_SCREENS_H_ */

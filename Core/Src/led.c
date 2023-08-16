@@ -4,8 +4,7 @@
 
 #include "led.h"
 
-// TODO: make this buffer include the start and stop bits?
-led_frame_type board_led_list[LED_NUMBER] = {0};
+static volatile led_frame_type board_led_list[LED_NUMBER] = {0};
 
 static const led_frame_type led_off = {0xE0, 0x00, 0x00, 0x00};
 

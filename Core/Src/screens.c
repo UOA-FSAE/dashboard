@@ -1,4 +1,3 @@
-
 #include <screens.h>
 #include <lvgl.h>
 #include <vehicle.h>
@@ -13,7 +12,10 @@ extern Vehicle_Data the_vehicle;
 #define SOFTWARE_INVERT_SCREEN 0    // TODO: implement this?
 #define USE_DOUBLE_BUFFER 0
 
+// Screen switching flags
 enum SCREENS current_screen;
+
+static volatile uint8_t screen_switch_flag = 0;
 
 // Display Driver
 static lv_disp_draw_buf_t the_display_buf;
@@ -29,6 +31,7 @@ volatile lv_color_t *buf_2 = (lv_color_t *)0xC0000000+272*480*4;
 volatile lv_color_t buf_1[100*100];
 volatile lv_color_t buf_2[100*100];
 #endif
+
 // Create screens
 // Driver Screen and Objects
 // TODO: Should globals be static?
@@ -59,22 +62,8 @@ lv_obj_t *dbs_rr_motor_inverter_temp_err_code;
 lv_obj_t *dbs_motor_loop_coolant_temp;
 lv_obj_t *dbs_inverter_loop_coolant_temp;
 
-uint32_t column_line_counter = 1;
-
-void init_obj_at_point(lv_obj_t * obj, lv_align_t alignment, int x_ofs, int y_ofs) {
-#if SOFTWARE_INVERT_SCREEN
-    lv_obj_set_style_text_align(obj, alignment, 0);
-    lv_obj_align(obj, alignment, 480-x_ofs, 272-y_ofs);
-    lv_obj_set_style_transform_angle(obj,1800,0);
-#else
-    lv_obj_set_style_text_align(obj, alignment, 0);
-    lv_obj_align(obj, alignment, x_ofs, y_ofs);
-#endif
-}
-
 // Private local flush buffer function
 #if USE_DOUBLE_BUFFER
-
 void flush_callback(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
 {
 //	(hltdc.LayerCfg[0]).FBStartAdress = (uint32_t)color_p;
@@ -130,6 +119,9 @@ void init_displays() {
     disp = lv_disp_drv_register(&the_display_drv);
 #endif
 }
+
+// Cursor parking lot
+
 
 void init_screens() {
     // Driver Screen
@@ -307,8 +299,15 @@ void update_screen() {
 }
 
 void cycle_screens() {
-    current_screen = (current_screen + 1) % 2;
-    change_screens(current_screen);
+    screen_switch_flag = 1;
+}
+
+void try_switch_screens() {
+    if (screen_switch_flag){
+        screen_switch_flag = 0;
+        current_screen = (current_screen + 1) % 2;
+        change_screens(current_screen);
+    }
 }
 
 void change_screens(enum SCREENS screen) {
