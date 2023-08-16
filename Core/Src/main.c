@@ -67,30 +67,6 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-// Private local flush buffer function
-//void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
-//{
-//	volatile uint32_t *ram_address = (uint32_t *)0xC0000000;
-////	(hltdc.LayerCfg[0]).FBStartAdress = (uint32_t)color_p;
-////  HAL_LTDC_SetAddress_NoReload(&hltdc, (uint32_t)color_p, LTDC_LAYER_1);
-//	int width = area->x2 - area->x1+1;
-//	for (int i = 0;i<=area->y2-area->y1;i++){
-//		memcpy(ram_address+(area->y1+i)*480+area->x1,color_p+width*i,4*width);
-//	}
-//  /* IMPORTANT!!!
-//  * Inform the graphics library that you are ready with the flushing*/
-//  lv_disp_flush_ready(disp_drv);
-//}
-
-void my_flush_cb(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
-{
-//	(hltdc.LayerCfg[0]).FBStartAdress = (uint32_t)color_p;
-  HAL_LTDC_SetAddress(&hltdc, (uint32_t)color_p, LTDC_LAYER_1);
-  /* IMPORTANT!!!
-  * Inform the graphics library that you are ready with the flushing*/
-  lv_disp_flush_ready(disp_drv);
-}
-
 /* USER CODE END 0 */
 
 /**
@@ -128,8 +104,6 @@ int main(void)
   MX_TIM14_Init();
   MX_TIM13_Init();
   /* USER CODE BEGIN 2 */
-  	  lv_init();
-
       // LED Initializationss
       init_led();
       set_all_red();
@@ -137,27 +111,8 @@ int main(void)
       SDRAM_Init(&hsdram1);
       HAL_Delay(10);
 
-      static lv_disp_draw_buf_t disp_buf;
-//      /*Static or global buffer(s). The second buffer is optional*/
-      volatile lv_color_t *buf_1 = (lv_color_t *)0xC0000000;
-      volatile lv_color_t *buf_2 = (lv_color_t *)0xC0000000+272*480*4;
-
-      /*Initialize `disp_buf` with the buffer(s) */
-      lv_disp_draw_buf_init(&disp_buf, buf_1, buf_2, 480*272);
-
-      static lv_disp_drv_t disp_drv;                 /*A variable to hold the drivers. Can be local variable*/
-      lv_disp_drv_init(&disp_drv);            /*Basic initialization*/
-	  disp_drv.draw_buf = &disp_buf;            /*Set an initialized buffer*/
-	  disp_drv.direct_mode = 1;
-	  disp_drv.full_refresh = 1;
-	  disp_drv.sw_rotate = 0;
-	  disp_drv.hor_res = 480;
-	  disp_drv.ver_res = 272;
-	  disp_drv.rotated = LV_DISP_ROT_180;
-	  disp_drv.flush_cb = my_flush_cb;
-	  lv_disp_t * disp;
-	  disp = lv_disp_drv_register(&disp_drv);
-
+      // Initialize the driver
+      init_displays();
 	  init_screens();
 
 	  HAL_TIM_Base_Start_IT(&htim14);

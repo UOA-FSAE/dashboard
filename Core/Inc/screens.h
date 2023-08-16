@@ -7,6 +7,10 @@ enum SCREENS {
 	DEBUG_SCREEN
 };
 
+// CALL THIS FIRST
+void init_displays();
+
+// CALL THIS SECOND
 void init_screens();
 
 void update_screen();

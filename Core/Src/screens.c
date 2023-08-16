@@ -2,19 +2,47 @@
 #include <screens.h>
 #include <lvgl.h>
 #include <vehicle.h>
+#include <ltdc.h>
 
 extern Vehicle_Data the_vehicle;
 
 #define LINE_HEIGHT 14
 #define LEFT_COLUMN_TAB 5
 
+// Driver Type
+#define SOFTWARE_INVERT_SCREEN 0    // TODO: implement this?
+#define USE_DOUBLE_BUFFER 0
+
 enum SCREENS current_screen;
 
+// Display Driver
+static lv_disp_draw_buf_t the_display_buf;
+static lv_disp_drv_t the_display_drv;                 /*A variable to hold the drivers.*/
+
+lv_disp_t * disp;
+
+// Static or global buffer(s).
+#if USE_DOUBLE_BUFFER
+volatile lv_color_t *buf_1 = (lv_color_t *)0xC0000000;
+volatile lv_color_t *buf_2 = (lv_color_t *)0xC0000000+272*480*4;
+#else
+volatile lv_color_t buf_1[100*100];
+volatile lv_color_t buf_2[100*100];
+#endif
 // Create screens
 // Driver Screen and Objects
+// TODO: Should globals be static?
 lv_obj_t *driver_screen;
+
+// Debug screen styles
+static lv_style_t speedometer_foreground_style;
+static lv_style_t speedometer_background_style;
+
 lv_obj_t * rpm_arc;
 lv_obj_t * throttle_arc;
+
+// Debug Screen and Objects
+lv_obj_t *debug_screen;
 
 lv_obj_t *dbs_battery_voltage;
 lv_obj_t *dbs_steering_position;
@@ -31,16 +59,10 @@ lv_obj_t *dbs_rr_motor_inverter_temp_err_code;
 lv_obj_t *dbs_motor_loop_coolant_temp;
 lv_obj_t *dbs_inverter_loop_coolant_temp;
 
-
-// Debug Screen and Objects
-lv_obj_t *debug_screen;
-
 uint32_t column_line_counter = 1;
 
-#define FAKE_ROTATED 1
-
 void init_obj_at_point(lv_obj_t * obj, lv_align_t alignment, int x_ofs, int y_ofs) {
-#ifdef FAKE_ROTATED
+#if SOFTWARE_INVERT_SCREEN
     lv_obj_set_style_text_align(obj, alignment, 0);
     lv_obj_align(obj, alignment, 480-x_ofs, 272-y_ofs);
     lv_obj_set_style_transform_angle(obj,1800,0);
@@ -50,34 +72,106 @@ void init_obj_at_point(lv_obj_t * obj, lv_align_t alignment, int x_ofs, int y_of
 #endif
 }
 
+// Private local flush buffer function
+#if USE_DOUBLE_BUFFER
+
+void flush_callback(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+{
+//	(hltdc.LayerCfg[0]).FBStartAdress = (uint32_t)color_p;
+    HAL_LTDC_SetAddress(&hltdc, (uint32_t)color_p, LTDC_LAYER_1);
+    /* IMPORTANT!!!
+    * Inform the graphics library that you are ready with the flushing*/
+    lv_disp_flush_ready(disp_drv);
+}
+#else
+void flush_callback(lv_disp_drv_t * disp_drv, const lv_area_t * area, lv_color_t * color_p)
+{
+    volatile uint32_t *ram_address = (uint32_t *)0xC0000000;
+    int width = area->x2 - area->x1+1;
+    for (int i = 0;i<=area->y2-area->y1;i++){
+        memcpy(ram_address+(area->y1+i)*480+area->x1,color_p+width*i,4*width);
+    }
+    /* IMPORTANT!!!
+    * Inform the graphics library that you are ready with the flushing*/
+    lv_disp_flush_ready(disp_drv);
+}
+#endif
+
+void init_displays() {
+    lv_init();
+
+    /*Initialize `disp_buf` with the buffer(s) */
+
+#if USE_DOUBLE_BUFFER
+    lv_disp_draw_buf_init(&the_display_buf, buf_1, buf_2, 480*272);
+
+    lv_disp_drv_init(&the_display_drv);            /*Basic initialization*/
+    the_display_drv.draw_buf = &the_display_buf;            /*Set an initialized buffer*/
+    the_display_drv.direct_mode = 1;
+    the_display_drv.full_refresh = 1;
+    the_display_drv.sw_rotate = 0;
+    the_display_drv.hor_res = 480;
+    the_display_drv.ver_res = 272;
+    the_display_drv.rotated = LV_DISP_ROT_180;
+    the_display_drv.flush_cb = flush_callback;
+    disp = lv_disp_drv_register(&the_display_drv);
+#else
+    lv_disp_draw_buf_init(&the_display_buf, buf_1, buf_2, 100*100);
+
+    lv_disp_drv_init(&the_display_drv);            /*Basic initialization*/
+    the_display_drv.draw_buf = &the_display_buf;            /*Set an initialized buffer*/
+    the_display_drv.direct_mode = 0;
+    the_display_drv.full_refresh = 0;
+    the_display_drv.sw_rotate = 1;
+    the_display_drv.hor_res = 480;
+    the_display_drv.ver_res = 272;
+    the_display_drv.rotated = LV_DISP_ROT_180;
+    the_display_drv.flush_cb = flush_callback;
+    disp = lv_disp_drv_register(&the_display_drv);
+#endif
+}
+
 void init_screens() {
     // Driver Screen
     driver_screen = lv_obj_create(NULL);
     lv_scr_load(driver_screen);
     current_screen = DRIVER_SCREEN;
 
-    lv_obj_set_style_bg_color(driver_screen, lv_color_hex(0x003a57), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(driver_screen, lv_color_hex(0x01121f), LV_PART_MAIN);
     lv_obj_set_style_text_color(driver_screen, lv_color_hex(0xffffff), LV_PART_MAIN);
 
+    // Speedometer foreground style
+    lv_style_init(&speedometer_foreground_style);
+    lv_style_set_arc_rounded(&speedometer_foreground_style,false);
+    lv_style_set_arc_color(&speedometer_foreground_style,lv_palette_main(LV_PALETTE_DEEP_ORANGE));
+    lv_style_set_arc_width(&speedometer_foreground_style,40);
+
+    lv_style_init(&speedometer_background_style);
+    lv_style_set_arc_rounded(&speedometer_background_style,false);
+    lv_style_set_arc_width(&speedometer_background_style,40);
 
 
     rpm_arc = lv_arc_create(driver_screen);
     lv_arc_set_bg_angles(rpm_arc, 150, 30);
     lv_arc_set_angles(rpm_arc, 150, 150+70);
-    lv_obj_set_size(rpm_arc, 150, 150);
+    lv_obj_set_size(rpm_arc, 180, 180);
+
+    lv_obj_add_style(rpm_arc,&speedometer_foreground_style,LV_PART_INDICATOR);
+    lv_obj_add_style(rpm_arc,&speedometer_background_style,LV_PART_MAIN);
     lv_obj_remove_style(rpm_arc, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
     lv_obj_clear_flag(rpm_arc, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
     lv_obj_align(rpm_arc, LV_ALIGN_LEFT_MID, 40, 0);
-    lv_obj_set_style_arc_color(rpm_arc,lv_palette_main(LV_PALETTE_DEEP_ORANGE),LV_PART_INDICATOR);
 
     throttle_arc = lv_arc_create(driver_screen);
     lv_arc_set_bg_angles(throttle_arc, 150, 30);
     lv_arc_set_angles(throttle_arc, 150, 150+70);
-    lv_obj_set_size(throttle_arc, 150, 150);
+    lv_obj_set_size(throttle_arc, 180, 180);
+
+    lv_obj_add_style(throttle_arc,&speedometer_foreground_style,LV_PART_INDICATOR);
+    lv_obj_add_style(throttle_arc,&speedometer_background_style,LV_PART_MAIN);
     lv_obj_remove_style(throttle_arc, NULL, LV_PART_KNOB);   /*Be sure the knob is not displayed*/
     lv_obj_clear_flag(throttle_arc, LV_OBJ_FLAG_CLICKABLE);  /*To not allow adjusting by click*/
     lv_obj_align(throttle_arc, LV_ALIGN_RIGHT_MID, -40, 0);
-    lv_obj_set_style_arc_color(throttle_arc,lv_palette_main(LV_PALETTE_DEEP_ORANGE),LV_PART_INDICATOR);
 
 
     //////////////////
