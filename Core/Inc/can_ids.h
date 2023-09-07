@@ -26,4 +26,6 @@
 #define CAN_ID_FRONT_RIGHT_DRIVE           0x386
 #define CAN_ID_REAR_RIGHT_DRIVE            0x387
 
+#define CAN_ID_STEERING_BUTTONS            0x400
+
 #endif //DASHBOARD_CAN_CALLBACKS_H

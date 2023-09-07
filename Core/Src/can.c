@@ -19,7 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "can.h"
-
+#include "tim.h"
 /* USER CODE BEGIN 0 */
 #include "can_ids.h"
 #include "vehicle.h"
@@ -27,6 +27,8 @@
 #include "screens.h"
 
 extern volatile Vehicle_Data the_vehicle;
+volatile bool RTDS_FLAG = false;
+
 /* USER CODE END 0 */
 
 CAN_HandleTypeDef hcan1;
@@ -314,10 +316,18 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 				set_led(SHUTDOWN,LED_RED);
 			}	// TODO: add shutdown status
 			if(the_vehicle.race.vehicleState.RTDState) {
+                if (!RTDS_FLAG) {
+                    RTDS_FLAG = true;
+                    HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET);
+                    HAL_TIM_Base_Start_IT(&htim13);
+                }
 				set_led(READY,LED_GREEN);
 			} else {
-				set_led(READY,LED_BLACK);
+                RTDS_FLAG = false;
+                set_led(READY,LED_BLACK);
 			}
+
+
 
             break;
         case CAN_ID_DRIVER_DATA:
@@ -357,9 +367,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 				set_led(RL,LED_GREEN);
 			}
 			break;
-//        case CAN_ID_VGPIO:
-//            cycle_screens();
-//            break;
+        case CAN_ID_STEERING_BUTTONS:
+            if (RxData[0] & 0b00001000) cycle_screens();
+            break;
     }
 }
 
