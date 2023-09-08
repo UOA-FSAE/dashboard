@@ -28,6 +28,7 @@
 
 extern volatile Vehicle_Data the_vehicle;
 volatile bool RTDS_FLAG = false;
+volatile bool CYCLE_SCREEN_FLAG = false;
 
 /* USER CODE END 0 */
 
@@ -342,7 +343,6 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 				the_vehicle.driver.brakeBias = ((the_vehicle.driver.frontBrakePressure * 100.0) /the_vehicle.driver.rearBrakePressure);
 			}
             break;
-
         case CAN_ID_REAR_LEFT_DRIVE:
         	i--;
         case CAN_ID_FRONT_LEFT_DRIVE:
@@ -367,8 +367,13 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 				set_led(RL,LED_GREEN);
 			}
 			break;
-        case CAN_ID_STEERING_BUTTONS:
-            if (RxData[0] & 0b00001000) cycle_screens();
+        case CAN_ID_VGPIO_MOTEC:
+            if ((RxData[0] & 0b00000001)&&(!CYCLE_SCREEN_FLAG)) {
+                cycle_screens();
+                CYCLE_SCREEN_FLAG = true;
+            } else if (!(RxData[0] & 0b00000001)) {
+                CYCLE_SCREEN_FLAG = false;
+            }
             break;
     }
 }

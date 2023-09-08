@@ -19,13 +19,12 @@
 #define CAN_ID_RACE_DATA                   0x604
 #define CAN_ID_DRIVER_DATA                 0x605
 
-#define CAN_ID_VGPIO_DASHBOARD             0x610
+#define CAN_ID_VGPIO_MOTEC                 0x500
+#define CAN_ID_VGPIO_DASHBOARD             0x501
 
 #define CAN_ID_REAR_LEFT_DRIVE             0x384
 #define CAN_ID_FRONT_LEFT_DRIVE            0x385
 #define CAN_ID_FRONT_RIGHT_DRIVE           0x386
 #define CAN_ID_REAR_RIGHT_DRIVE            0x387
-
-#define CAN_ID_STEERING_BUTTONS            0x400
 
 #endif //DASHBOARD_CAN_CALLBACKS_H

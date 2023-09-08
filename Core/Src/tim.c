@@ -175,6 +175,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     } else if (htim == &htim13) // Timer 13 is for testing, operates at 0.33 Hz
     {
         // This timer is for RTDS buzzer
+        // Should do . . - . _ . . . _ . - _ . _ . . . . - _ - - . . .
         HAL_TIM_Base_Stop_IT(&htim13);
         HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET);
     }
