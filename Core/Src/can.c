@@ -19,12 +19,13 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "can.h"
-#include "tim.h"
+
 /* USER CODE BEGIN 0 */
 #include "can_ids.h"
 #include "vehicle.h"
 #include "led.h"
 #include "screens.h"
+#include "tim.h"
 
 extern volatile Vehicle_Data the_vehicle;
 volatile bool RTDS_FLAG = false;
@@ -162,9 +163,10 @@ void send_can_message(int std_id, uint8_t *buffer, int length) {
 	  TxHeader.RTR = CAN_RTR_DATA;
 	  TxHeader.DLC = length;
 
-	  if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, buffer, &TxMailbox) != HAL_OK) {
-		  Error_Handler();
-	  }
+      HAL_CAN_AddTxMessage(&hcan1, &TxHeader, buffer, &TxMailbox);
+//	  if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, buffer, &TxMailbox) != HAL_OK) {
+//		  Error_Handler();
+//	  }
 }
 
 
@@ -319,7 +321,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 			if(the_vehicle.race.vehicleState.RTDState) {
                 if (!RTDS_FLAG) {
                     RTDS_FLAG = true;
-                    HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET);
+//                    HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET);
                     HAL_TIM_Base_Start_IT(&htim13);
                 }
 				set_led(READY,LED_GREEN);
