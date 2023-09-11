@@ -64,7 +64,9 @@ bool iterate_morse(morse_handle *handle) {
     } else {
         if (!morse_lookup[get_letter_id(handle->string[handle->letter_counter])][handle->morse_counter+1]) {   // If end of letter
             if (!handle->string[handle->letter_counter+1]) {  // If end of string restart letter counter
-//                handle->letter_counter = 0;
+                handle->letter_counter = 0;
+                handle->morse_counter = 0;
+                handle->sound_counter = morse_lookup[get_letter_id(handle->string[0])][0];
                 handle->false_counter++;
                 return false;
             } else {

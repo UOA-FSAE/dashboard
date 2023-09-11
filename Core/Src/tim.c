@@ -203,6 +203,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
             HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_RESET);
         }
         if (mandle.false_counter != 0) {
+            RTDS_FLAG = false;
+            mandle.false_counter = 0;
             HAL_TIM_Base_Stop_IT(&htim13);
         }
 
