@@ -33,36 +33,36 @@ volatile bool CYCLE_SCREEN_FLAG = false;
 
 /* USER CODE END 0 */
 
-CAN_HandleTypeDef hcan1;
+CAN_HandleTypeDef hcan3;
 
-/* CAN1 init function */
-void MX_CAN1_Init(void)
+/* CAN3 init function */
+void MX_CAN3_Init(void)
 {
 
-  /* USER CODE BEGIN CAN1_Init 0 */
+  /* USER CODE BEGIN CAN3_Init 0 */
 
-  /* USER CODE END CAN1_Init 0 */
+  /* USER CODE END CAN3_Init 0 */
 
-  /* USER CODE BEGIN CAN1_Init 1 */
+  /* USER CODE BEGIN CAN3_Init 1 */
 
-  /* USER CODE END CAN1_Init 1 */
-  hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 27;
-  hcan1.Init.Mode = CAN_MODE_NORMAL;
-  hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan1.Init.TimeSeg1 = CAN_BS1_6TQ;
-  hcan1.Init.TimeSeg2 = CAN_BS2_1TQ;
-  hcan1.Init.TimeTriggeredMode = DISABLE;
-  hcan1.Init.AutoBusOff = DISABLE;
-  hcan1.Init.AutoWakeUp = DISABLE;
-  hcan1.Init.AutoRetransmission = DISABLE;
-  hcan1.Init.ReceiveFifoLocked = DISABLE;
-  hcan1.Init.TransmitFifoPriority = DISABLE;
-  if (HAL_CAN_Init(&hcan1) != HAL_OK)
+  /* USER CODE END CAN3_Init 1 */
+  hcan3.Instance = CAN3;
+  hcan3.Init.Prescaler = 9;
+  hcan3.Init.Mode = CAN_MODE_NORMAL;
+  hcan3.Init.SyncJumpWidth = CAN_SJW_1TQ;
+  hcan3.Init.TimeSeg1 = CAN_BS1_13TQ;
+  hcan3.Init.TimeSeg2 = CAN_BS2_2TQ;
+  hcan3.Init.TimeTriggeredMode = DISABLE;
+  hcan3.Init.AutoBusOff = DISABLE;
+  hcan3.Init.AutoWakeUp = DISABLE;
+  hcan3.Init.AutoRetransmission = DISABLE;
+  hcan3.Init.ReceiveFifoLocked = DISABLE;
+  hcan3.Init.TransmitFifoPriority = DISABLE;
+  if (HAL_CAN_Init(&hcan3) != HAL_OK)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN CAN1_Init 2 */
+  /* USER CODE BEGIN CAN3_Init 2 */
 
   CAN_FilterTypeDef sFilterConfig;
 
@@ -77,21 +77,21 @@ void MX_CAN1_Init(void)
       sFilterConfig.FilterActivation = ENABLE;
 
 
-      if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK) {
+      if (HAL_CAN_ConfigFilter(&hcan3, &sFilterConfig) != HAL_OK) {
           Error_Handler();
       }
 
 
-      if (HAL_CAN_Start(&hcan1) != HAL_OK) {
+      if (HAL_CAN_Start(&hcan3) != HAL_OK) {
           Error_Handler();
       }
 
 
-      if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {
+      if (HAL_CAN_ActivateNotification(&hcan3, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {
           Error_Handler();
       }
 
-  /* USER CODE END CAN1_Init 2 */
+  /* USER CODE END CAN3_Init 2 */
 
 }
 
@@ -99,57 +99,57 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
 {
 
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(canHandle->Instance==CAN1)
+  if(canHandle->Instance==CAN3)
   {
-  /* USER CODE BEGIN CAN1_MspInit 0 */
+  /* USER CODE BEGIN CAN3_MspInit 0 */
 
-  /* USER CODE END CAN1_MspInit 0 */
-    /* CAN1 clock enable */
-    __HAL_RCC_CAN1_CLK_ENABLE();
+  /* USER CODE END CAN3_MspInit 0 */
+    /* CAN3 clock enable */
+    __HAL_RCC_CAN3_CLK_ENABLE();
 
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**CAN1 GPIO Configuration
-    PA11     ------> CAN1_RX
-    PA12     ------> CAN1_TX
+    /**CAN3 GPIO Configuration
+    PA8     ------> CAN3_RX
+    PA15     ------> CAN3_TX
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_12;
+    GPIO_InitStruct.Pin = GPIO_PIN_8|GPIO_PIN_15;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF9_CAN1;
+    GPIO_InitStruct.Alternate = GPIO_AF11_CAN3;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /* CAN1 interrupt Init */
-    HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
-  /* USER CODE BEGIN CAN1_MspInit 1 */
+    /* CAN3 interrupt Init */
+    HAL_NVIC_SetPriority(CAN3_RX0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(CAN3_RX0_IRQn);
+  /* USER CODE BEGIN CAN3_MspInit 1 */
 
-  /* USER CODE END CAN1_MspInit 1 */
+  /* USER CODE END CAN3_MspInit 1 */
   }
 }
 
 void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 {
 
-  if(canHandle->Instance==CAN1)
+  if(canHandle->Instance==CAN3)
   {
-  /* USER CODE BEGIN CAN1_MspDeInit 0 */
+  /* USER CODE BEGIN CAN3_MspDeInit 0 */
 
-  /* USER CODE END CAN1_MspDeInit 0 */
+  /* USER CODE END CAN3_MspDeInit 0 */
     /* Peripheral clock disable */
-    __HAL_RCC_CAN1_CLK_DISABLE();
+    __HAL_RCC_CAN3_CLK_DISABLE();
 
-    /**CAN1 GPIO Configuration
-    PA11     ------> CAN1_RX
-    PA12     ------> CAN1_TX
+    /**CAN3 GPIO Configuration
+    PA8     ------> CAN3_RX
+    PA15     ------> CAN3_TX
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_11|GPIO_PIN_12);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_8|GPIO_PIN_15);
 
-    /* CAN1 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(CAN1_RX0_IRQn);
-  /* USER CODE BEGIN CAN1_MspDeInit 1 */
+    /* CAN3 interrupt Deinit */
+    HAL_NVIC_DisableIRQ(CAN3_RX0_IRQn);
+  /* USER CODE BEGIN CAN3_MspDeInit 1 */
 
-  /* USER CODE END CAN1_MspDeInit 1 */
+  /* USER CODE END CAN3_MspDeInit 1 */
   }
 }
 
@@ -163,7 +163,7 @@ void send_can_message(int std_id, uint8_t *buffer, int length) {
 	  TxHeader.RTR = CAN_RTR_DATA;
 	  TxHeader.DLC = length;
 
-      HAL_CAN_AddTxMessage(&hcan1, &TxHeader, buffer, &TxMailbox);
+      HAL_CAN_AddTxMessage(&hcan3, &TxHeader, buffer, &TxMailbox);
 //	  if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, buffer, &TxMailbox) != HAL_OK) {
 //		  Error_Handler();
 //	  }

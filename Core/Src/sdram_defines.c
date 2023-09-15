@@ -37,7 +37,8 @@ void SDRAM_Init(SDRAM_HandleTypeDef *hsdram1) {
            SDRAM_MODEREG_OPERATING_MODE_STANDARD | SDRAM_MODEREG_WRITEBURST_MODE_SINGLE;
     SDRAM_SendCommand(FMC_SDRAM_CMD_LOAD_MODE, 1, 1, temp, hsdram1);
 
-    HAL_SDRAM_ProgramRefreshRate(hsdram1, 1668);
+//    HAL_SDRAM_ProgramRefreshRate(hsdram1, 1668);
+    HAL_SDRAM_ProgramRefreshRate(hsdram1, 1105);
 }
 
 float SDRAM_Test(long int size_of_ram_in_bytes) {
