@@ -104,7 +104,7 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM14_Init();
   MX_TIM13_Init();
-  MX_CAN2_Init();
+  MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
     // LED Initializations
     init_led();
