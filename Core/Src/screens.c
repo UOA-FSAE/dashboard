@@ -239,13 +239,13 @@ void init_screens() {
 
     // Accumulator Lowest Cell Voltage
     dbs_acc_lowest_cell_voltage = lv_label_create(debug_screen);
-    lv_label_set_text_fmt(dbs_acc_lowest_cell_voltage, "ACC V-low : %d V", the_vehicle.ts.minVoltage);
+    lv_label_set_text_fmt(dbs_acc_lowest_cell_voltage, "ACC V-low : %.2f V", the_vehicle.ts.minVoltage);
     lv_obj_set_style_text_align(dbs_acc_lowest_cell_voltage, LV_ALIGN_TOP_LEFT, 0);
     lv_obj_align(dbs_acc_lowest_cell_voltage, LV_ALIGN_TOP_LEFT, LEFT_COLUMN_TAB, 7 * LINE_HEIGHT);
 
     // Accumulator Highest Cell Voltage
     dbs_acc_highest_cell_voltage = lv_label_create(debug_screen);
-    lv_label_set_text_fmt(dbs_acc_highest_cell_voltage, "ACC V-high: %d V", the_vehicle.ts.maxVoltage);
+    lv_label_set_text_fmt(dbs_acc_highest_cell_voltage, "ACC V-high: %.2f V", the_vehicle.ts.maxVoltage);
     lv_obj_set_style_text_align(dbs_acc_highest_cell_voltage, LV_ALIGN_TOP_LEFT, 0);
     lv_obj_align(dbs_acc_highest_cell_voltage, LV_ALIGN_TOP_LEFT, LEFT_COLUMN_TAB, 8 * LINE_HEIGHT);
 
@@ -310,8 +310,8 @@ void try_update_screen() {
                               the_vehicle.driver.frontBrakePressure);
         lv_label_set_text_fmt(dbs_brake_pressure_rear, "Rear Brake Pressure: %d kPa", the_vehicle.driver.rearBrakePressure);
         lv_label_set_text_fmt(dbs_acc_soc, "ACC SOC: %d %%", the_vehicle.ts.soc);
-        lv_label_set_text_fmt(dbs_acc_lowest_cell_voltage, "ACC V-low : %d V", the_vehicle.ts.minVoltage);
-        lv_label_set_text_fmt(dbs_acc_highest_cell_voltage, "ACC V-high: %d V", the_vehicle.ts.maxVoltage);
+        lv_label_set_text_fmt(dbs_acc_lowest_cell_voltage, "ACC V-low : %.2f V", the_vehicle.ts.minVoltage);
+        lv_label_set_text_fmt(dbs_acc_highest_cell_voltage, "ACC V-high: %.2f V", the_vehicle.ts.maxVoltage);
         lv_label_set_text_fmt(dbs_fl_motor_inverter_temp_err_code, "FLT: MT=%d\tIT=%d\terr=%d",
                               the_vehicle.drive[0].motorTemp, the_vehicle.drive[0].inverterTemp,
                               the_vehicle.drive[0].errorCode);
