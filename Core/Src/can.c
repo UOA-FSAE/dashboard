@@ -210,13 +210,13 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             break;
 
         case CAN_ID_ACCUMULATOR_VOLTAGES:
-        	the_vehicle.ts.maxVoltage              = (RxData[1]<<8 & 0xFF00) + RxData[0];
+        	the_vehicle.ts.maxVoltage              = (RxData[0]<<8 & 0xFF00) + RxData[1];
 			the_vehicle.ts.maxVoltage              = ((float)the_vehicle.ts.maxVoltage) / 10000.0f;
 
-			the_vehicle.ts.avgVoltage              = (RxData[3]<<8 & 0xFF00) + RxData[2];
+			the_vehicle.ts.avgVoltage              = (RxData[2]<<8 & 0xFF00) + RxData[3];
 			the_vehicle.ts.avgVoltage              = ((float)the_vehicle.ts.avgVoltage) / 10000.0f;
 
-			the_vehicle.ts.minVoltage              = (RxData[5]<<8 & 0xFF00) + RxData[4];
+			the_vehicle.ts.minVoltage              = (RxData[4]<<8 & 0xFF00) + RxData[5];
 			the_vehicle.ts.minVoltage              = ((float)the_vehicle.ts.minVoltage) / 10000.0f;
 
 			the_vehicle.ts.numCells                = RxData[6];
