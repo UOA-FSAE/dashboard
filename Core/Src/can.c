@@ -179,6 +179,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         Error_Handler();
     }
     int i = 3;
+
+    if (RxHeader.IDE != CAN_ID_STD) return;
+
     switch (RxHeader.StdId) {
         case CAN_ID_ACCUMULATOR_PACK_DATA:
         	the_vehicle.ts.current                 = (int16_t)((RxData[0]<<8 & 0xFF00) + RxData[1]);
