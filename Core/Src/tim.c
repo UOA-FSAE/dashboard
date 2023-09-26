@@ -60,7 +60,7 @@ void MX_TIM13_Init(void)
 
   /* USER CODE END TIM13_Init 1 */
   htim13.Instance = TIM13;
-  htim13.Init.Prescaler = 165;
+  htim13.Init.Prescaler = 105;
   htim13.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim13.Init.Period = 65535;
   htim13.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -192,8 +192,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
         // Queue an update for the screen
         update_screen();
-    } else if (htim == &htim13) // Timer 13 is for testing, operates at 0.33 Hz
-        // TODO: Change timer to 10Hz
+    } else if (htim == &htim13)
     {
         // This timer is for RTDS buzzer
         // Should do . . - . _ . . . _ . - _ . _ . . . . - _ - - . . .
