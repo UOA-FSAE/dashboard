@@ -329,7 +329,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
                 }
 				set_led(READY,LED_GREEN);
 			} else {
-                RTDS_FLAG = false;
+                if (RTDS_FLAG) RTDS_FLAG = false;
                 set_led(READY,LED_BLACK);
 			}
 
