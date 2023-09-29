@@ -34,6 +34,7 @@
 #include <string.h>
 #include <lvgl.h>
 #include "screens.h"
+#include "dash_error.h"
 #include "morse.h"
 /* USER CODE END Includes */
 
@@ -41,7 +42,7 @@
 /* USER CODE BEGIN PTD */
 // Global vehicle
 volatile Vehicle_Data the_vehicle = {0};
-
+volatile enum DASH_ERROR_TYPE current_error = CAN_ERROR;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -198,6 +199,11 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
     /* User can add his own implementation to report the HAL error return state */
+    if (current_error == CAN_ERROR) {
+        HAL_CAN_DeInit(&hcan1);
+        MX_CAN1_Init();
+        return;
+    }
     __disable_irq();
     while (1) {
     }

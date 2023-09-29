@@ -26,8 +26,10 @@
 #include "led.h"
 #include "screens.h"
 #include "tim.h"
+#include "dash_error.h"
 
 extern volatile Vehicle_Data the_vehicle;
+extern volatile enum DASH_ERROR_TYPE current_error;
 volatile bool RTDS_FLAG = false;
 volatile bool CYCLE_SCREEN_FLAG = false;
 
@@ -163,10 +165,11 @@ void send_can_message(int std_id, uint8_t *buffer, int length) {
 	  TxHeader.RTR = CAN_RTR_DATA;
 	  TxHeader.DLC = length;
 
-      HAL_CAN_AddTxMessage(&hcan1, &TxHeader, buffer, &TxMailbox);
-//	  if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, buffer, &TxMailbox) != HAL_OK) {
-//		  Error_Handler();
-//	  }
+//      HAL_CAN_AddTxMessage(&hcan1, &TxHeader, buffer, &TxMailbox);
+	  if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, buffer, &TxMailbox) != HAL_OK) {
+          current_error = CAN_ERROR;
+          Error_Handler();
+	  }
 }
 
 
