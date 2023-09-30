@@ -64,8 +64,7 @@ void MX_CAN1_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN CAN2_Init 1 */
-
+  /* USER CODE BEGIN CAN1_Init 2 */
   CAN_FilterTypeDef sFilterConfig;
 
       sFilterConfig.FilterBank = 0;
@@ -92,8 +91,7 @@ void MX_CAN1_Init(void)
       if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK) {
           Error_Handler();
       }
-
-  /* USER CODE END CAN2_Init 1 */
+  /* USER CODE END CAN1_Init 2 */
 
 }
 
@@ -332,7 +330,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
                 }
 				set_led(READY,LED_GREEN);
 			} else {
-                if (RTDS_FLAG) RTDS_FLAG = false;
+                RTDS_FLAG = false;
                 set_led(READY,LED_BLACK);
 			}
 
