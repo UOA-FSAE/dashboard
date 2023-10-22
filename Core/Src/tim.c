@@ -35,7 +35,7 @@
 
 // morse handle
 volatile morse_handle mandle;
-static const char morse_string[] = "47";
+static const char morse_string[] = "4 7";
 
 extern volatile Vehicle_Data the_vehicle;
 extern volatile bool RTDS_FLAG;

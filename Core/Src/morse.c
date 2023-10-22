@@ -41,10 +41,12 @@ uint8_t morse_lookup[36][6] = {
         {2, 2, 1, 1, 1, 0},     //7
         {2, 2, 2, 1, 1, 0},     //8
         {2, 2, 2, 2, 1, 0},     //9
+        {0, 0, 0, 0, 0, 0},     // space
 };
 
 int get_letter_id(char letter) {
     int letter_id = letter - 'A';
+    if (letter_id == -33) return 36;
     if (letter_id < 0) letter_id += (17+26);
     return letter_id;
 }
