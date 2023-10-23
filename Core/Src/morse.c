@@ -4,7 +4,7 @@
 
 // 1 is dot, 2 is space, 0 is end of letter
 // if negative add 17+26
-uint8_t morse_lookup[36][6] = {
+int8_t morse_lookup[37][6] = {
         {1, 2, 0, 0, 0, 0}, //A
         {2, 1, 1, 1, 0, 0}, //B
         {2, 1, 2, 1, 0, 0}, //C
@@ -41,11 +41,11 @@ uint8_t morse_lookup[36][6] = {
         {2, 2, 1, 1, 1, 0},     //7
         {2, 2, 2, 1, 1, 0},     //8
         {2, 2, 2, 2, 1, 0},     //9
-        {0, 0, 0, 0, 0, 0},     // space
+        {-2, 0, 0, 0, 0, 0},     // space
 };
 
-int get_letter_id(char letter) {
-    int letter_id = letter - 'A';
+int8_t get_letter_id(char letter) {
+    int8_t letter_id = letter - 'A';
     if (letter_id == -33) return 36;
     if (letter_id < 0) letter_id += (17+26);
     return letter_id;
@@ -60,7 +60,11 @@ void init_morse_handle(morse_handle *handle,const char *string) {
 }
 
 bool iterate_morse(morse_handle *handle) {
-    if (handle->sound_counter) {
+	if (handle->sound_counter < 0) {
+		handle->sound_counter++;
+		return false;
+	}
+    if (handle->sound_counter > 0) {
         handle->sound_counter--;
         return true;
     } else {
