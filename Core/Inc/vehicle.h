@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+// TODO: This class should contain something to check if the value changed
+
 //TS Data
 typedef struct {
 
