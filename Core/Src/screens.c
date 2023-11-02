@@ -325,8 +325,8 @@ void init_screens() {
     lv_obj_add_style(glv_power, &accumulator_style, LV_PART_INDICATOR);
     lv_obj_set_size(glv_power, 80, 140);
     lv_obj_align(glv_power, LV_ALIGN_CENTER, 70, 20);
-    lv_bar_set_range(glv_power, 0, 100);
-    lv_bar_set_value(glv_power, 60, LV_ANIM_OFF);
+    lv_bar_set_range(glv_power, 0, 294);
+    lv_bar_set_value(glv_power, 0, LV_ANIM_OFF);
 
     glv_text = lv_label_create(energy_screen);     // GLV Live Text
     lv_obj_align(glv_text, LV_ALIGN_CENTER, 70, 20);
@@ -452,8 +452,8 @@ void try_update_screen() {
         lv_bar_set_value(regen_power, 0, LV_ANIM_OFF);  // TODO: CAN MESSAGE NEEDED
         lv_bar_set_value(accumulator_power, the_vehicle.ts.soc, LV_ANIM_OFF);
         lv_label_set_text_fmt(accumulator_text, "%d %%", the_vehicle.ts.soc);
-        lv_bar_set_value(glv_power, the_vehicle.glv.soc, LV_ANIM_OFF);
-        lv_label_set_text_fmt(glv_text, "%d %%", the_vehicle.glv.soc);
+        lv_bar_set_value(glv_power, (uint32_t)(the_vehicle.glv.voltage*10), LV_ANIM_OFF);
+        lv_label_set_text_fmt(glv_text, "%.1f %%", the_vehicle.glv.voltage);
         lv_bar_set_value(power_mode, 1, LV_ANIM_OFF);   // TODO: CAN MESSAGE NEEDED
     } else if (lv_scr_act() == lap_screen) {
         uint32_t minutes = the_vehicle.race.currentLapTime/60000;

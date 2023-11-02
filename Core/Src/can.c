@@ -27,6 +27,7 @@
 #include "screens.h"
 #include "tim.h"
 #include "dash_error.h"
+#include <stdint.h>
 
 extern volatile Vehicle_Data the_vehicle;
 extern volatile enum DASH_ERROR_TYPE current_error;
@@ -175,6 +176,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     CAN_RxHeaderTypeDef RxHeader;
     uint8_t RxData[8];
 
+    uint32_t lap_time;  // Used in the case statement
+
     // Probably need a more robust check :skull:
     if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK) {
         Error_Handler();
@@ -290,50 +293,54 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             break;
 
         case CAN_ID_RACE_DATA:
-        	the_vehicle.race.currentLapTime      = (RxData[3]<<24 & 0xFF000000) + (RxData[2]<<16 & 0x00FF0000) + (RxData[1]<<8 & 0X0000FF00) + (RxData[0] & 0xFF) ;
-			the_vehicle.race.currentSpeed        = RxData[4];
-			the_vehicle.race.lapNumber           = RxData[5];
+            lap_time =
+                    (RxData[3] << 24 & 0xFF000000) + (RxData[2] << 16 & 0x00FF0000) + (RxData[1] << 8 & 0X0000FF00) +
+                    (RxData[0] & 0xFF);
+            if (lap_time < the_vehicle.race.currentLapTime) the_vehicle.race.previousLapTime = the_vehicle.race.currentLapTime;
+            the_vehicle.race.currentLapTime = lap_time;
+            the_vehicle.race.currentSpeed = RxData[4];
+            the_vehicle.race.lapNumber = RxData[5];
 
-			//Update the best lap time if it is actually better, and update the deltaLapTime
-			the_vehicle.race.bestLapTime         = (the_vehicle.race.bestLapTime <=the_vehicle.race.currentLapTime) ?the_vehicle.race.currentLapTime :the_vehicle.race.bestLapTime;
-			the_vehicle.race.deltaLapTime        = (the_vehicle.race.currentLapTime -the_vehicle.race.bestLapTime);
+            //Update the best lap time if it is actually better, and update the deltaLapTime
+            the_vehicle.race.bestLapTime = (the_vehicle.race.bestLapTime <= the_vehicle.race.currentLapTime)
+                                           ? the_vehicle.race.currentLapTime : the_vehicle.race.bestLapTime;
+            the_vehicle.race.deltaLapTime = (the_vehicle.race.currentLapTime - the_vehicle.race.bestLapTime);
 
-			the_vehicle.race.vehicleState.GLV            = (RxData[7] & 0x01) >> 0;
-			the_vehicle.race.vehicleState.shutdown       = (RxData[7] & 0x02) >> 1;
-			the_vehicle.race.vehicleState.precharging    = (RxData[7] & 0x04) >> 2;
-			the_vehicle.race.vehicleState.precharged     = (RxData[7] & 0x08) >> 3;
-			the_vehicle.race.vehicleState.RTDState       = (RxData[7] & 0x10) >> 4;
+            the_vehicle.race.vehicleState.GLV = (RxData[7] & 0x01) >> 0;
+            the_vehicle.race.vehicleState.shutdown = (RxData[7] & 0x02) >> 1;
+            the_vehicle.race.vehicleState.precharging = (RxData[7] & 0x04) >> 2;
+            the_vehicle.race.vehicleState.precharged = (RxData[7] & 0x08) >> 3;
+            the_vehicle.race.vehicleState.RTDState = (RxData[7] & 0x10) >> 4;
 
-			if(the_vehicle.race.vehicleState.precharged) {
-				set_led(TS_ACT,LED_GREEN);
-			} else if(the_vehicle.race.vehicleState.precharging) {
-				set_led(TS_ACT,LED_BLUE);
-			} else {
-				set_led(TS_ACT,LED_BLACK);
-			}
+            if (the_vehicle.race.vehicleState.precharged) {
+                set_led(TS_ACT, LED_GREEN);
+            } else if (the_vehicle.race.vehicleState.precharging) {
+                set_led(TS_ACT, LED_BLUE);
+            } else {
+                set_led(TS_ACT, LED_BLACK);
+            }
 
-			if (the_vehicle.race.vehicleState.GLV) {
-				set_led(GLV,LED_GREEN);
-			} else {
-				set_led(GLV,LED_RED);
-			}
-			if (the_vehicle.race.vehicleState.shutdown) {
-				set_led(SHUTDOWN,LED_GREEN);
-			} else {
-				set_led(SHUTDOWN,LED_RED);
-			}	// TODO: add shutdown status
-			if(the_vehicle.race.vehicleState.RTDState) {
+            if (the_vehicle.race.vehicleState.GLV) {
+                set_led(GLV, LED_GREEN);
+            } else {
+                set_led(GLV, LED_RED);
+            }
+            if (the_vehicle.race.vehicleState.shutdown) {
+                set_led(SHUTDOWN, LED_GREEN);
+            } else {
+                set_led(SHUTDOWN, LED_RED);
+            }    // TODO: add shutdown status
+            if (the_vehicle.race.vehicleState.RTDState) {
                 if (!RTDS_FLAG) {
                     RTDS_FLAG = true;
 //                    HAL_GPIO_WritePin(GPIOE,GPIO_PIN_2,GPIO_PIN_SET);
                     HAL_TIM_Base_Start_IT(&htim13);
                 }
-				set_led(READY,LED_GREEN);
-			} else {
+                set_led(READY, LED_GREEN);
+            } else {
                 RTDS_FLAG = false;
-                set_led(READY,LED_BLACK);
-			}
-
+                set_led(READY, LED_BLACK);
+            }
 
 
             break;
