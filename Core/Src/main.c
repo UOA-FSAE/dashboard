@@ -117,9 +117,9 @@ int main(void)
     // Initialize the driver
     init_displays();
     init_screens();
+    change_screens(DRIVER_SCREEN);
 
     HAL_TIM_Base_Start_IT(&htim14);
-//    HAL_TIM_Base_Start_IT(&htim13);
 
   /* USER CODE END 2 */
 
