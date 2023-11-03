@@ -1,6 +1,6 @@
-#include <lvgl.h>
 #include "screens.h"
-#include "vehicle.h"
+
+#include "styles.h"
 
 #include "driver_screen.h"
 #include "debug_screen.h"
@@ -46,47 +46,20 @@ LV_FONT_DECLARE(bitstream_vera_sans_26)
 LV_FONT_DECLARE(bitstream_vera_sans_30)
 LV_FONT_DECLARE(bitstream_vera_sans_80)
 
-////////////
-// Styles //
-////////////
-static lv_style_t speedometer_style;
-static lv_style_t colored_label_style;
-static lv_style_t regular_text;
-static lv_style_t title_text;       // Style for title text (unused)
-static lv_style_t accumulator_style;
-static lv_style_t text_box_style; // Text box style (for border)
-static lv_style_t regen_style;    // Regen Style
-static lv_style_t rpm_style;    // RPM style
-
 /////////////
 // Objects //
 /////////////
+
+static lv_style_t title_text;       // Style for title text (unused)
 
 void init_screens() {
     ////////////
     // Styles //
     ////////////
 
-    lv_style_init(&regular_text);
-    lv_style_set_text_font(&regular_text,&lv_font_montserrat_18);
-    lv_style_set_text_align(&regular_text,LV_ALIGN_CENTER);
-
     lv_style_init(&title_text);
     lv_style_set_text_font(&title_text,&lv_font_montserrat_28);
     lv_style_set_text_align(&title_text,LV_ALIGN_CENTER);
-
-    lv_style_init(&colored_label_style);
-    lv_style_set_text_align(&colored_label_style,LV_ALIGN_TOP_LEFT);
-    lv_style_set_radius(&colored_label_style,5);
-    lv_style_set_pad_all(&colored_label_style,10);
-    lv_style_set_bg_opa(&colored_label_style,LV_OPA_COVER);
-
-    lv_style_init(&rpm_style);
-    lv_style_set_bg_opa(&rpm_style, LV_OPA_COVER);
-    lv_style_set_bg_color(&rpm_style, lv_palette_main(LV_PALETTE_BLUE));
-    lv_style_set_bg_grad_color(&rpm_style, lv_palette_main(LV_PALETTE_RED));
-    lv_style_set_bg_grad_dir(&rpm_style, LV_GRAD_DIR_HOR);
-    lv_style_set_radius(&rpm_style,3);
 
     init_driver_screen();
     init_debug_screen();

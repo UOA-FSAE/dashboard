@@ -16,6 +16,10 @@ lv_obj_t * power_mode_label;
 
 extern Vehicle_Data the_vehicle;
 
+static lv_style_t accumulator_style;
+static lv_style_t regen_style;    // Regen Style
+static lv_style_t regular_text;
+
 void init_energy_screen() {
     ///////////////////
     // Energy Screen //
@@ -23,6 +27,10 @@ void init_energy_screen() {
     energy_screen = lv_obj_create(NULL);
     lv_obj_set_style_bg_color(energy_screen, lv_color_hex(0x01121f), LV_PART_MAIN);   // Energy Screen Init
     lv_obj_set_style_text_color(energy_screen, lv_color_hex(0xffffff), LV_PART_MAIN);
+
+    lv_style_init(&regular_text);
+    lv_style_set_text_font(&regular_text,&lv_font_montserrat_18);
+    lv_style_set_text_align(&regular_text,LV_ALIGN_CENTER);
 
     lv_style_init(&regen_style);
     lv_style_set_bg_opa(&regen_style, LV_OPA_COVER);
@@ -72,13 +80,13 @@ void init_energy_screen() {
     lv_obj_add_style(glv_power, &accumulator_style, LV_PART_INDICATOR);
     lv_obj_set_size(glv_power, 80, 140);
     lv_obj_align(glv_power, LV_ALIGN_CENTER, 70, 20);
-    lv_bar_set_range(glv_power, 0, 294);
+    lv_bar_set_range(glv_power, 220, 294);
     lv_bar_set_value(glv_power, 0, LV_ANIM_OFF);
 
     glv_text = lv_label_create(energy_screen);     // GLV Live Text
     lv_obj_align(glv_text, LV_ALIGN_CENTER, 70, 20);
     lv_obj_set_style_text_font(glv_text,&lv_font_montserrat_26,LV_PART_MAIN);
-    lv_label_set_text_fmt(glv_text, "%d %%", 60);
+    lv_label_set_text_fmt(glv_text, "%d V", 60);
 
     glv_label = lv_label_create(energy_screen);    // GLV Label
     lv_obj_add_style(glv_label,&regular_text,LV_PART_MAIN);
@@ -108,7 +116,7 @@ void update_energy_screen() {
     lv_bar_set_value(regen_power, 0, LV_ANIM_OFF);  // TODO: CAN MESSAGE NEEDED
     lv_bar_set_value(accumulator_power, the_vehicle.ts.soc, LV_ANIM_OFF);
     lv_label_set_text_fmt(accumulator_text, "%d %%", the_vehicle.ts.soc);
-    lv_bar_set_value(glv_power, (uint32_t)(the_vehicle.glv.voltage*10), LV_ANIM_OFF);   // TODO: CAN MESSAGE NEEDED
-    lv_label_set_text_fmt(glv_text, "%.1f %%", the_vehicle.glv.voltage);
+    lv_bar_set_value(glv_power, (int32_t)(the_vehicle.glv.voltage*10), LV_ANIM_OFF);   // TODO: CAN MESSAGE NEEDED
+    lv_label_set_text_fmt(glv_text, "%.1f V", (double)the_vehicle.glv.voltage);
     lv_bar_set_value(power_mode, 1, LV_ANIM_OFF);   // TODO: CAN MESSAGE NEEDED
 }

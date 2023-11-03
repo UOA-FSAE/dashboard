@@ -10,13 +10,23 @@ lv_obj_t * throttle_label;
 
 extern Vehicle_Data the_vehicle;
 
+static lv_style_t speedometer_style;
+static lv_style_t colored_label_style;
+
 void init_driver_screen() {
+    
     //////////////////
     // Driver Screen//
     //////////////////
     driver_screen = lv_obj_create(NULL);    // Driver Screen Init
     lv_obj_set_style_bg_color(driver_screen, lv_color_hex(0x01121f), LV_PART_MAIN);
     lv_obj_set_style_text_color(driver_screen, lv_color_hex(0xffffff), LV_PART_MAIN);
+
+    lv_style_init(&colored_label_style);
+    lv_style_set_text_align(&colored_label_style,LV_ALIGN_TOP_LEFT);
+    lv_style_set_radius(&colored_label_style,5);
+    lv_style_set_pad_all(&colored_label_style,10);
+    lv_style_set_bg_opa(&colored_label_style,LV_OPA_COVER);
 
     lv_style_init(&speedometer_style);    // Speedometer foreground style
     lv_style_set_arc_rounded(&speedometer_style,false);
