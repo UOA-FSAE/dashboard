@@ -18,6 +18,8 @@ void resetDataStructure(Vehicle_Data *input_data) {
     input_data->driver.frontBrakePressure = 0;
     input_data->driver.rearBrakePressure = 0;
     input_data->driver.throttle = 0;
+    input_data->driver.rpm = 0;
+    input_data->driver.regen_power = 0;
 
     input_data->race.currentLapTime = 0;
     input_data->race.currentSpeed = 0;

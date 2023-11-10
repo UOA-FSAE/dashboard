@@ -293,17 +293,12 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             break;
 
         case CAN_ID_RACE_DATA:
-            lap_time =
+            the_vehicle.race.currentLapTime =
                     (RxData[3] << 24 & 0xFF000000) + (RxData[2] << 16 & 0x00FF0000) + (RxData[1] << 8 & 0X0000FF00) +
                     (RxData[0] & 0xFF);
-            if (lap_time < the_vehicle.race.currentLapTime) the_vehicle.race.previousLapTime = the_vehicle.race.currentLapTime;
-            the_vehicle.race.currentLapTime = lap_time;
             the_vehicle.race.currentSpeed = RxData[4];
             the_vehicle.race.lapNumber = RxData[5];
 
-            //Update the best lap time if it is actually better, and update the deltaLapTime
-            the_vehicle.race.bestLapTime = (the_vehicle.race.bestLapTime <= the_vehicle.race.currentLapTime)
-                                           ? the_vehicle.race.currentLapTime : the_vehicle.race.bestLapTime;
             the_vehicle.race.deltaLapTime = (the_vehicle.race.currentLapTime - the_vehicle.race.bestLapTime);
 
             the_vehicle.race.vehicleState.GLV = (RxData[7] & 0x01) >> 0;
@@ -341,8 +336,18 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
                 RTDS_FLAG = false;
                 set_led(READY, LED_BLACK);
             }
-
-
+            break;
+        case CAN_ID_RACE_DATA_2:
+            the_vehicle.race.bestLapTime =
+                    (RxData[3] << 24 & 0xFF000000) + (RxData[2] << 16 & 0x00FF0000) + (RxData[1] << 8 & 0X0000FF00) +
+                    (RxData[0] & 0xFF);
+            the_vehicle.race.previousLapTime =
+                    (RxData[3] << 24 & 0xFF000000) + (RxData[2] << 16 & 0x00FF0000) + (RxData[1] << 8 & 0X0000FF00) +
+                    (RxData[0] & 0xFF);
+            break;
+        case CAN_ID_POWER_INFO:
+            the_vehicle.driver.torque = RxData[0];
+            the_vehicle.driver.regen_power = RxData[1];
             break;
         case CAN_ID_DRIVER_DATA:
         	the_vehicle.driver.steeringAngle       = RxData[0];

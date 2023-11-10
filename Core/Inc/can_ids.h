@@ -17,14 +17,16 @@
 #define CAN_ID_GLV                         0x602
 #define CAN_ID_FAULT                       0x603
 #define CAN_ID_RACE_DATA                   0x604
-#define CAN_ID_DRIVER_DATA                 0x605
+#define CAN_ID_RACE_DATA_2                 0x605
+#define CAN_ID_DRIVER_DATA                 0x606
+#define CAN_ID_POWER_INFO                  0x607
 
-#define CAN_ID_VGPIO_MOTEC                 0x500    // Needs 2, 3, 4 0b
-#define CAN_ID_VGPIO_DASHBOARD             0x501
+#define CAN_ID_VGPIO_MOTEC                 0x620    // Needs 2, 3, 4 0b
+#define CAN_ID_VGPIO_DASHBOARD             0x621
 
-#define CAN_ID_REAR_LEFT_DRIVE             0x384
-#define CAN_ID_FRONT_LEFT_DRIVE            0x385
-#define CAN_ID_FRONT_RIGHT_DRIVE           0x386
-#define CAN_ID_REAR_RIGHT_DRIVE            0x387
+#define CAN_ID_REAR_LEFT_DRIVE             0x610
+#define CAN_ID_FRONT_LEFT_DRIVE            0x611
+#define CAN_ID_FRONT_RIGHT_DRIVE           0x612
+#define CAN_ID_REAR_RIGHT_DRIVE            0x613
 
 #endif //DASHBOARD_CAN_CALLBACKS_H

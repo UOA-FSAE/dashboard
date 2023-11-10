@@ -51,8 +51,9 @@ typedef struct {
     uint8_t frontBrakePressure;    // 0 to 255 kPa
     uint8_t rearBrakePressure;    // 0 to 255 kPa
     uint8_t throttle;                // 0 to 100%
-    uint8_t torque;                    // 0 to 210%
+    uint8_t torque;                    // 0 to 100%
     uint16_t rpm;                    // 0 to 65,535 rpms
+    uint8_t regen_power;            // 0 to 100%
 } DRIVER_DATA;
 
 //Motor/Inverter/Drive System Data type
