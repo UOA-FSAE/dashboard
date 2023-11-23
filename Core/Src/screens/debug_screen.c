@@ -143,13 +143,13 @@ void update_debug_screen() {
     lv_label_set_text_fmt(dbs_fl_motor_inverter_temp_err_code, "FLT: MT=%d\tIT=%d\terr=%d",
                             the_vehicle.drive[0].motorTemp, the_vehicle.drive[0].inverterTemp,
                             the_vehicle.drive[0].errorCode);
-    lv_label_set_text_fmt(dbs_fr_motor_inverter_temp_err_code, "FLT: MT=%d\tIT=%d\terr=%d",
+    lv_label_set_text_fmt(dbs_fr_motor_inverter_temp_err_code, "FRT: MT=%d\tIT=%d\terr=%d",
                             the_vehicle.drive[1].motorTemp, the_vehicle.drive[1].inverterTemp,
                             the_vehicle.drive[1].errorCode);
-    lv_label_set_text_fmt(dbs_rl_motor_inverter_temp_err_code, "FLT: MT=%d\tIT=%d\terr=%d",
+    lv_label_set_text_fmt(dbs_rl_motor_inverter_temp_err_code, "RLT: MT=%d\tIT=%d\terr=%d",
                             the_vehicle.drive[2].motorTemp, the_vehicle.drive[2].inverterTemp,
                             the_vehicle.drive[2].errorCode);
-    lv_label_set_text_fmt(dbs_rr_motor_inverter_temp_err_code, "FLT: MT=%d\tIT=%d\terr=%d",
+    lv_label_set_text_fmt(dbs_rr_motor_inverter_temp_err_code, "RRT: MT=%d\tIT=%d\terr=%d",
                             the_vehicle.drive[3].motorTemp, the_vehicle.drive[3].inverterTemp,
                             the_vehicle.drive[3].errorCode);
 }
