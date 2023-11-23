@@ -171,6 +171,11 @@ void send_can_message(int std_id, uint8_t *buffer, int length) {
 	  }
 }
 
+float exp_lookup[5] = {1.0f,0.1f,0.01f,0.001f,0.0001f}; // Don't tell Chris
+
+float process_can_decimal(int integer, int neg_exponent) {
+    return (float)integer*exp_lookup[neg_exponent];
+}
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     CAN_RxHeaderTypeDef RxHeader;
