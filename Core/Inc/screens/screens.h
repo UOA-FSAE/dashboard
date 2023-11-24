@@ -8,7 +8,8 @@ enum SCREENS {
 	DRIVER_SCREEN,
 	DEBUG_SCREEN,
     ENERGY_SCREEN,
-    LAP_SCREEN
+    LAP_SCREEN,     // <- Insert after here (error should be last)
+    ERROR_SCREEN
 };
 
 // CALL THIS FIRST
@@ -24,6 +25,10 @@ void update_screen(void);
 void try_cycle_screens(void);
 
 void cycle_screens(void);
+
+void queue_change_screens(enum SCREENS screen);
+
+void try_change_screens(void);
 
 void change_screens(enum SCREENS screen);
 

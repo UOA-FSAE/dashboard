@@ -273,29 +273,34 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 			//Set fault LEDs, these are easy: RED or OFF, and nothing fancy
 			if(the_vehicle.errors.IMD) {
 				set_led(IMD,LED_RED);
+                queue_change_screens(ERROR_SCREEN);
 			} else {
 				set_led(IMD,LED_BLACK);
 			}
 
 			if(the_vehicle.errors.AMS) {
 				set_led(AMS,LED_RED);
-			}else{
+                queue_change_screens(ERROR_SCREEN);
+            }else{
 				set_led(AMS,LED_BLACK);
 			}
 
 			if(the_vehicle.errors.PDOC) {
 				set_led(PDOC,LED_RED);
-			} else {
+                queue_change_screens(ERROR_SCREEN);
+            } else {
 				set_led(PDOC,LED_BLACK);
 			}
 
 			if(the_vehicle.errors.BSPD) {
 				set_led(BSPD,LED_RED);
-			} else {
+                queue_change_screens(ERROR_SCREEN);
+            } else {
 				set_led(BSPD,LED_BLACK);
 			}
 
 			set_led(ERROR2,LED_BLACK);
+
             break;
 
         case CAN_ID_RACE_DATA:

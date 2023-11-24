@@ -45,6 +45,8 @@ void init_popups() {
     lv_obj_set_style_text_align(label_popup,LV_TEXT_ALIGN_CENTER,LV_PART_MAIN);
     lv_obj_align(label_popup, LV_ALIGN_TOP_LEFT, 50, 10);
     lv_label_set_text(label_popup,"Updated Dials");
+
+    disable_popup();
 }
 
 void set_popup(int L,int R) {

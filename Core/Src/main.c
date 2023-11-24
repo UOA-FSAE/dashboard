@@ -135,6 +135,7 @@ int main(void)
         try_cycle_screens();
         try_enable_popups();
         try_disable_popups();
+        try_change_screens();
 
         HAL_Delay(2);
 

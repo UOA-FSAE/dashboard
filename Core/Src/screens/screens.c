@@ -6,6 +6,7 @@
 #include "debug_screen.h"
 #include "energy_screen.h"
 #include "lap_screen.h"
+#include "error_screen.h"
 #include "popups.h"
 
 #ifndef USE_SIMULATOR
@@ -23,6 +24,10 @@ enum SCREENS current_screen;
 
 static volatile uint8_t screen_switch_flag = 0;
 static volatile uint8_t screen_update_flag = 0;
+static volatile bool screen_change_flag = false;
+static volatile enum SCREENS future_screen = ERROR_SCREEN;
+
+
 
 #ifndef USE_SIMULATOR
 // Display Driver
@@ -72,6 +77,7 @@ void init_screens() {
     init_energy_screen();
     init_lap_screen();
     init_popups();
+    init_error_screen();
 }
 
 void try_update_screen() {
@@ -90,6 +96,9 @@ void try_update_screen() {
         case LAP_SCREEN:
             update_lap_screen();
             break;
+        case ERROR_SCREEN:
+            update_error_screen();
+            break;
     }
 }
 
@@ -97,6 +106,18 @@ void ms_to_minutes_seconds(uint32_t ms, uint32_t * minutes, uint32_t * seconds, 
     *minutes = (uint32_t)(0.00001666666*ms);
     *seconds = (uint32_t)(0.001*ms)-60*(*minutes);
     *milliseconds = ms%1000;
+}
+
+void queue_change_screens(enum SCREENS screen) {
+    screen_change_flag = true;
+    future_screen = screen;
+}
+
+void try_change_screens() {
+    if (screen_change_flag) {
+        change_screens(future_screen);
+        screen_change_flag = false;
+    }
 }
 
 void update_screen() {
@@ -118,6 +139,9 @@ void change_screens(enum SCREENS screen) {
         case LAP_SCREEN:
             load_lap_screen();
             break;
+        case ERROR_SCREEN:
+            load_error_screen();
+            break;
     }
 }
 
@@ -126,7 +150,7 @@ void cycle_screens() {
 }
 
 void try_cycle_screens() {
-    if (screen_switch_flag){
+    if (screen_switch_flag && (current_screen != ERROR_SCREEN)){
         screen_switch_flag = 0;
         current_screen = (current_screen + 1) % 4;
         change_screens(current_screen);
