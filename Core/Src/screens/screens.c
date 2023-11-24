@@ -6,6 +6,7 @@
 #include "debug_screen.h"
 #include "energy_screen.h"
 #include "lap_screen.h"
+#include "popups.h"
 
 #ifndef USE_SIMULATOR
 #include <ltdc.h>
@@ -45,12 +46,17 @@ volatile lv_color_t buf_2[100*100];
 LV_FONT_DECLARE(bitstream_vera_sans_26)
 LV_FONT_DECLARE(bitstream_vera_sans_30)
 LV_FONT_DECLARE(bitstream_vera_sans_80)
+LV_FONT_DECLARE(bitstream_vera_sans_200)
 
 /////////////
 // Objects //
 /////////////
 
 static lv_style_t title_text;       // Style for title text (unused)
+
+///////////
+// Popup //
+///////////
 
 void init_screens() {
     ////////////
@@ -65,6 +71,7 @@ void init_screens() {
     init_debug_screen();
     init_energy_screen();
     init_lap_screen();
+    init_popups();
 }
 
 void try_update_screen() {
@@ -126,6 +133,28 @@ void try_cycle_screens() {
     }
 }
 
+bool enable_popups_flag;
+bool disable_popups_flag;
+
+void enable_popups() {
+    enable_popups_flag = true;
+}
+
+void try_enable_popups() {
+    if (!enable_popups_flag) return;
+    set_popup(the_vehicle.wheel.leftDial,the_vehicle.wheel.rightDial);
+    enable_popups_flag = false;
+}
+
+void disable_popups() {
+    disable_popups_flag = true;
+}
+
+void try_disable_popups() {
+    if (!disable_popups_flag) return;
+    disable_popup();
+    disable_popups_flag = false;
+}
 #ifndef USE_SIMULATOR
 
 // Private local flush buffer function

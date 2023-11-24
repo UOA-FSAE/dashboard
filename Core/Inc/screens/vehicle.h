@@ -56,6 +56,13 @@ typedef struct {
     uint8_t regen_power;            // 0 to 100%
 } DRIVER_DATA;
 
+typedef struct{
+    uint8_t leftPaddle;
+    uint8_t rightPaddle;
+    uint8_t leftDial;
+    uint8_t rightDial;
+} STEERING_WHEEL;
+
 //Motor/Inverter/Drive System Data type
 typedef struct {
     uint8_t gearboxTemp;            // 0 to 100 degC
@@ -97,6 +104,7 @@ typedef struct {
     DRIVER_DATA driver;        // We have one driver
     DRIVE_DATA drive[4];        // We have 4 motors and 4 motor controllers
     FAULT_DATA errors;        // We have a lot of errors
+    STEERING_WHEEL wheel;       // Useful for the steering wheel state
 } Vehicle_Data;
 
 void resetDataStructure(Vehicle_Data *input_data);

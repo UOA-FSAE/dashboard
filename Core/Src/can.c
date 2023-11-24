@@ -33,6 +33,7 @@ extern volatile Vehicle_Data the_vehicle;
 extern volatile enum DASH_ERROR_TYPE current_error;
 volatile bool RTDS_FLAG = false;
 volatile bool CYCLE_SCREEN_FLAG = false;
+volatile bool TOGGLE_POPUP_FLAG = false;
 
 /* USER CODE END 0 */
 
@@ -397,6 +398,18 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             } else if (!(RxData[0] & 0b00000001)) {
                 CYCLE_SCREEN_FLAG = false;
             }
+            if ((RxData[0] & 0b00000010)&&(!TOGGLE_POPUP_FLAG)) {
+                enable_popups();
+                TOGGLE_POPUP_FLAG = true;
+            } else if (!(RxData[0] & 0b00000010)) {
+                if (TOGGLE_POPUP_FLAG) disable_popups();
+                TOGGLE_POPUP_FLAG = false;
+            }
+            // Make sure to read dial here
+            the_vehicle.wheel.leftDial = (RxData[1] & 0b11110000) >> 4;
+            the_vehicle.wheel.rightDial = (RxData[1] & 0b00001111);
+            the_vehicle.wheel.leftPaddle = RxData[2];
+            the_vehicle.wheel.rightPaddle = RxData[3];
             break;
     }
 }

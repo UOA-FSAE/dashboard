@@ -118,7 +118,7 @@ int main(void)
     init_displays();
     init_screens();
     change_screens(DRIVER_SCREEN);
-
+    disable_popups();
     HAL_TIM_Base_Start_IT(&htim14);
 
   /* USER CODE END 2 */
@@ -133,6 +133,8 @@ int main(void)
 
         try_update_screen();
         try_cycle_screens();
+        try_enable_popups();
+        try_disable_popups();
 
         HAL_Delay(2);
 

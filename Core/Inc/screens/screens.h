@@ -29,4 +29,13 @@ void change_screens(enum SCREENS screen);
 
 void ms_to_minutes_seconds(uint32_t ms, uint32_t * minutes, uint32_t * seconds, uint32_t * milliseconds);
 
+void enable_popups(void);
+
+void disable_popups(void);
+
+void try_enable_popups(void);
+
+void try_disable_popups(void);
+
+
 #endif /* INC_SCREENS_H_ */

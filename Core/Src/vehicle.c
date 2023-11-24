@@ -50,6 +50,11 @@ void resetDataStructure(Vehicle_Data *input_data) {
         input_data->drive[i].errorCode = 0;
     }
 
+    input_data->wheel.leftPaddle = 0;
+    input_data->wheel.rightPaddle = 0;
+    input_data->wheel.leftDial = 0;
+    input_data->wheel.rightDial = 0;
+
 //Errors default to on
     input_data->errors.PDOC = 1;
     input_data->errors.AMS = 1;
