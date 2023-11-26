@@ -48,12 +48,13 @@ typedef struct {
 typedef struct {
     int8_t steeringAngle;            // -100 to 100 degrees from center SIGNED
     uint8_t brakeBias;                // 0 to 100% forward bias
-    uint8_t frontBrakePressure;    // 0 to 255 kPa
-    uint8_t rearBrakePressure;    // 0 to 255 kPa
+    uint8_t brakeState;             // On or Off
     uint8_t throttle;                // 0 to 100%
     uint8_t torque;                    // 0 to 100%
     uint16_t rpm;                    // 0 to 65,535 rpms
     uint8_t regen_power;            // 0 to 100%
+    float frontBrakePressure;    // 0 to 255 kPa
+    float rearBrakePressure;    // 0 to 255 kPa
 } DRIVER_DATA;
 
 typedef struct{
@@ -91,9 +92,12 @@ typedef struct {
     uint32_t currentLapTime;    // 0 to 300,000 ms
     uint32_t bestLapTime;        // 0 to 300,000 ms
     uint32_t previousLapTime;   // 0 to 300,000 ms
-    int32_t deltaLapTime;        // -300,000 to 300,000 ms
+    float deltaLapTime;        // -300,000 to 300,000 ms
     uint8_t currentSpeed;        // 0 to 255 kph
     uint8_t lapNumber;            // o to 255 laps
+    uint16_t lapTravel;           //
+    uint16_t sessionTravel;       //
+    uint16_t rpmAverage;          //
     VEHICLE_STATE vehicleState;
 } RACE_DATA;
 
