@@ -118,7 +118,7 @@ void update_lap_screen() {
     ms_to_minutes_seconds(the_vehicle.race.currentLapTime,&minutes,&seconds,&milliseconds);
     lv_label_set_text_fmt(current_lap_time,"%02d : %02d : %03d",minutes,seconds,milliseconds);
 
-    lv_label_set_text_fmt(lap_delta,"%.2f",0.001*the_vehicle.race.deltaLapTime);
+    lv_label_set_text_fmt(lap_delta,"%.2f",the_vehicle.race.deltaLapTime);
 
     ms_to_minutes_seconds(the_vehicle.race.bestLapTime,&minutes,&seconds,&milliseconds);
     lv_label_set_text_fmt(best_lap_time,"%02d : %02d : %03d",minutes,seconds,milliseconds);
