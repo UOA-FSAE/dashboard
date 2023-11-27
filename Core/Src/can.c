@@ -40,6 +40,8 @@ volatile bool TOGGLE_POPUP_FLAG = false;
 
 CAN_HandleTypeDef hcan1;
 
+int16_t twos_complement_buffer;
+
 /* CAN1 init function */
 void MX_CAN1_Init(void) {
 
@@ -196,7 +198,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             the_vehicle.ts.voltage = (RxData[2] << 8 & 0xFF00) + RxData[3];
             the_vehicle.ts.voltage = ((float) the_vehicle.ts.current) / 10.0f;
 
-            the_vehicle.ts.soc = RxData[4] / 2;
+//            the_vehicle.ts.soc = RxData[4] / 2;       LMAO
 
             set_led(ERROR1, LED_BLACK);
             if (the_vehicle.ts.soc) {
@@ -299,9 +301,9 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 
             break;
         case CAN_ID_RACE_DATA:  // TODO: Implement bytes 0->6
-            the_vehicle.race.lapTravel = (RxData[2] << 8) & 0xFF00 + (RxData[1]) & 0x00FF;
-            the_vehicle.race.sessionTravel = (RxData[4] << 8) & 0xFF00 + (RxData[3]) & 0x00FF;
-            the_vehicle.race.rpmAverage = (RxData[6] << 8) & 0xFF00 + (RxData[5]) & 0x00FF;
+            the_vehicle.race.lapTravel = (((RxData[2] << 8) & 0xFF00) + ((RxData[1]) & 0x00FF));
+            the_vehicle.race.sessionTravel = (((RxData[4] << 8) & 0xFF00) + ((RxData[3]) & 0x00FF));
+            the_vehicle.race.rpmAverage = (((RxData[6] << 8) & 0xFF00) + ((RxData[5]) & 0x00FF));
 
             the_vehicle.race.vehicleState.GLV = (RxData[7] & 0x01) >> 0;
             the_vehicle.race.vehicleState.shutdown = (RxData[7] & 0x02) >> 1;
@@ -342,7 +344,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             the_vehicle.race.currentLapTime =
                     (RxData[3] << 24 & 0xFF000000) + (RxData[2] << 16 & 0x00FF0000) + (RxData[1] << 8 & 0X0000FF00) +
                     (RxData[0] & 0xFF);
-            the_vehicle.race.deltaLapTime = 0.01f*(float)((RxData[6] << 8) & 0xFF00 + (RxData[5]) & 0x00FF);
+            memcpy(&twos_complement_buffer,&RxData[5],2*sizeof(uint8_t));
+            the_vehicle.race.deltaLapTime = 0.01f*(float)(twos_complement_buffer);
             the_vehicle.race.lapNumber = RxData[7];
             break;
 
@@ -357,8 +360,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         case CAN_ID_DRIVER_DATA:
             memcpy(&the_vehicle.driver.steeringAngle,&RxData[0],sizeof(uint8_t));   // I am the binary god
             the_vehicle.driver.brakeBias = RxData[1];
-            the_vehicle.driver.frontBrakePressure = 0.1f * (float)RxData[2];
-            the_vehicle.driver.rearBrakePressure = 0.1f * (float)RxData[3];
+            the_vehicle.driver.frontBrakePressure = RxData[2];
+            the_vehicle.driver.rearBrakePressure = RxData[3];
             the_vehicle.driver.throttle = RxData[4];
 
 //            //Override displayed brake bias if it's not even sent
@@ -366,6 +369,11 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
 //                the_vehicle.driver.brakeBias = ((the_vehicle.driver.frontBrakePressure * 100.0) /
 //                                                the_vehicle.driver.rearBrakePressure);
 //            }
+            break;
+        case CAN_ID_DRIVER_DATA_2:
+            the_vehicle.driver.torque = 0.1f * (float)(RxData[0]);
+            the_vehicle.driver.speed_constant = ((RxData[2] << 8) & 0xFF00) + ((RxData[1]) & 0xFF);
+            the_vehicle.ts.soc = RxData[3];
             break;
         case CAN_ID_REAR_LEFT_DRIVE:
             i--;

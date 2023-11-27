@@ -98,7 +98,7 @@ void init_energy_screen() {
     lv_obj_add_style(power_mode, &accumulator_style, LV_PART_INDICATOR);
     lv_obj_set_size(power_mode, 30, 200);
     lv_obj_align(power_mode, LV_ALIGN_RIGHT_MID, -40, -10);
-    lv_bar_set_range(power_mode, 0, 6);
+    lv_bar_set_range(power_mode, 0, 21);
     lv_bar_set_value(power_mode, 1, LV_ANIM_OFF);
 
     power_mode_label = lv_label_create(energy_screen);    // Power Mode Label
@@ -118,5 +118,5 @@ void update_energy_screen() {
     lv_label_set_text_fmt(accumulator_text, "%d %%", the_vehicle.ts.soc);
     lv_bar_set_value(glv_power, (int32_t)(the_vehicle.glv.voltage*10), LV_ANIM_OFF);   // TODO: CAN MESSAGE NEEDED
     lv_label_set_text_fmt(glv_text, "%.1f V", (double)the_vehicle.glv.voltage);
-    lv_bar_set_value(power_mode, 1, LV_ANIM_OFF);   // TODO: CAN MESSAGE NEEDED
+    lv_bar_set_value(power_mode, (uint8_t)(10*the_vehicle.driver.torque), LV_ANIM_OFF);
 }

@@ -20,6 +20,7 @@
 #define CAN_ID_LAP_DATA                    0x605
 #define CAN_ID_LAP_DATA_2                  0x606
 #define CAN_ID_DRIVER_DATA                 0x607
+#define CAN_ID_DRIVER_DATA_2               0x608
 
 #define CAN_ID_VGPIO_MOTEC                 0x620    // Needs 2, 3, 4 0b
 #define CAN_ID_VGPIO_DASHBOARD             0x621

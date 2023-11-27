@@ -112,8 +112,8 @@ void update_lap_screen() {
     uint32_t seconds;
     uint32_t milliseconds;
 
-    lv_bar_set_value(lap_screen_rpm, the_vehicle.driver.rpm, LV_ANIM_OFF);
-    lv_label_set_text_fmt(lap_rpm_text,"%d",the_vehicle.driver.rpm);
+    lv_bar_set_value(lap_screen_rpm, the_vehicle.race.rpmAverage, LV_ANIM_OFF);
+    lv_label_set_text_fmt(lap_rpm_text,"%d",the_vehicle.race.rpmAverage);
 
     ms_to_minutes_seconds(the_vehicle.race.currentLapTime,&minutes,&seconds,&milliseconds);
     lv_label_set_text_fmt(current_lap_time,"%02d : %02d : %03d",minutes,seconds,milliseconds);

@@ -54,14 +54,14 @@ void init_debug_screen() {
 
     // Brake Pressure
     dbs_brake_pressure_front = lv_label_create(debug_screen);
-    lv_label_set_text_fmt(dbs_brake_pressure_front, "Front Brake Pressure: %d kPa",
+    lv_label_set_text_fmt(dbs_brake_pressure_front, "Front Brake Pressure: %d bar",
                           the_vehicle.driver.frontBrakePressure);
     lv_obj_set_style_text_align(dbs_brake_pressure_front, LV_ALIGN_TOP_LEFT, 0);
     lv_obj_align(dbs_brake_pressure_front, LV_ALIGN_TOP_LEFT, LEFT_COLUMN_TAB, 4 * LINE_HEIGHT);
 
     // Brake Pressure
     dbs_brake_pressure_rear = lv_label_create(debug_screen);
-    lv_label_set_text_fmt(dbs_brake_pressure_rear, "Rear Brake Pressure: %d kPa", the_vehicle.driver.rearBrakePressure);
+    lv_label_set_text_fmt(dbs_brake_pressure_rear, "Rear Brake Pressure: %d bar", the_vehicle.driver.rearBrakePressure);
     lv_obj_set_style_text_align(dbs_brake_pressure_rear, LV_ALIGN_TOP_LEFT, 0);
     lv_obj_align(dbs_brake_pressure_rear, LV_ALIGN_TOP_LEFT, LEFT_COLUMN_TAB, 5 * LINE_HEIGHT);
 
@@ -134,9 +134,9 @@ void update_debug_screen() {
     lv_label_set_text_fmt(dbs_battery_voltage, "GLV Voltage: %.2fV", (double)the_vehicle.glv.voltage);
     lv_label_set_text_fmt(dbs_steering_position, "Steering Position: %d deg", the_vehicle.driver.steeringAngle);
     lv_label_set_text_fmt(dbs_throttle_position, "Throttle Position: %d %% ", the_vehicle.driver.throttle);
-    lv_label_set_text_fmt(dbs_brake_pressure_front, "Front Brake Pressure: %d kPa",
+    lv_label_set_text_fmt(dbs_brake_pressure_front, "Front Brake Pressure: %d bar",
                             the_vehicle.driver.frontBrakePressure);
-    lv_label_set_text_fmt(dbs_brake_pressure_rear, "Rear Brake Pressure: %d kPa", the_vehicle.driver.rearBrakePressure);
+    lv_label_set_text_fmt(dbs_brake_pressure_rear, "Rear Brake Pressure: %d bar", the_vehicle.driver.rearBrakePressure);
     lv_label_set_text_fmt(dbs_acc_soc, "ACC SOC: %d %%", the_vehicle.ts.soc);
     lv_label_set_text_fmt(dbs_acc_lowest_cell_voltage, "ACC V-low : %.2f V", (double)the_vehicle.ts.minVoltage);
     lv_label_set_text_fmt(dbs_acc_highest_cell_voltage, "ACC V-high: %.2f V", (double)the_vehicle.ts.maxVoltage);

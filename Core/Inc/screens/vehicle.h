@@ -50,11 +50,12 @@ typedef struct {
     uint8_t brakeBias;                // 0 to 100% forward bias
     uint8_t brakeState;             // On or Off
     uint8_t throttle;                // 0 to 100%
-    uint8_t torque;                    // 0 to 100%
     uint16_t rpm;                    // 0 to 65,535 rpms
+    uint16_t speed_constant;         // fuckery
     uint8_t regen_power;            // 0 to 100%
-    float frontBrakePressure;    // 0 to 255 kPa
-    float rearBrakePressure;    // 0 to 255 kPa
+    uint8_t frontBrakePressure;    // 0 to 255 kPa
+    uint8_t rearBrakePressure;    // 0 to 255 kPa
+    float torque;                    // 0 to 100%
 } DRIVER_DATA;
 
 typedef struct{
