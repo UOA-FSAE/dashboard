@@ -152,4 +152,7 @@ void update_debug_screen() {
     lv_label_set_text_fmt(dbs_rr_motor_inverter_temp_err_code, "RRT: MT=%d\tIT=%d\terr=%d",
                             the_vehicle.drive[3].motorTemp, the_vehicle.drive[3].inverterTemp,
                             the_vehicle.drive[3].errorCode);
+
+    lv_label_set_text_fmt(dbs_motor_loop_coolant_temp, "motor coolant temp: %d deg", the_vehicle.driver.motor_cooling_temp);
+    lv_label_set_text_fmt(dbs_inverter_loop_coolant_temp, "inverter coolant temp: %d deg", the_vehicle.driver.inverter_cooling_temp);
 }

@@ -373,6 +373,8 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
         case CAN_ID_DRIVER_DATA_2:
             the_vehicle.driver.torque = 0.1f * (float)(RxData[0]);
             the_vehicle.driver.speed_constant = ((RxData[2] << 8) & 0xFF00) + ((RxData[1]) & 0xFF);
+            the_vehicle.driver.inverter_cooling_temp = RxData[4];
+            the_vehicle.driver.motor_cooling_temp = RxData[5];
             the_vehicle.ts.soc = RxData[3];
             break;
         case CAN_ID_REAR_LEFT_DRIVE:

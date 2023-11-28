@@ -55,6 +55,8 @@ typedef struct {
     uint8_t regen_power;            // 0 to 100%
     uint8_t frontBrakePressure;    // 0 to 255 kPa
     uint8_t rearBrakePressure;    // 0 to 255 kPa
+    uint8_t motor_cooling_temp;
+    uint8_t inverter_cooling_temp;
     float torque;                    // 0 to 100%
 } DRIVER_DATA;
 
