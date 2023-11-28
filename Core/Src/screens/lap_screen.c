@@ -73,7 +73,7 @@ void init_lap_screen() {
     best_lap_time = lv_label_create(lap_screen);    // Best Lap Time
     lv_obj_add_style(best_lap_time,&text_box_style,LV_PART_MAIN);
     lv_obj_set_style_text_font(best_lap_time,&bitstream_vera_sans_26,LV_PART_MAIN);
-    lv_obj_set_style_text_color(best_lap_time,lv_palette_main(LV_PALETTE_PURPLE),LV_PART_MAIN);
+    lv_obj_set_style_text_color(best_lap_time,lv_palette_lighten(LV_PALETTE_PURPLE,2),LV_PART_MAIN);
 
     minutes = the_vehicle.race.bestLapTime/60000;
     seconds = the_vehicle.race.bestLapTime/1000-60*minutes;
@@ -119,6 +119,13 @@ void update_lap_screen() {
     lv_label_set_text_fmt(current_lap_time,"%02d : %02d : %03d",minutes,seconds,milliseconds);
 
     lv_label_set_text_fmt(lap_delta,"%.2f",the_vehicle.race.deltaLapTime);
+
+    if(the_vehicle.race.deltaLapTime > 0.0){
+    	lv_obj_set_style_text_color(lap_delta,lv_palette_lighten(LV_PALETTE_RED,1),LV_PART_MAIN);
+    }
+    else{
+    	lv_obj_set_style_text_color(lap_delta,lv_palette_lighten(LV_PALETTE_LIGHT_GREEN,2),LV_PART_MAIN);
+    }
 
     ms_to_minutes_seconds(the_vehicle.race.bestLapTime,&minutes,&seconds,&milliseconds);
     lv_label_set_text_fmt(best_lap_time,"%02d : %02d : %03d",minutes,seconds,milliseconds);
