@@ -178,10 +178,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     {
         // Transmit CAN Message to state the status of the GPIO Pins
         // TODO: This should be triggered on interrupt
-        vgpio_can_register = ((0b00000001 & HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_3) << 0)
-                              | (0b00000010 & HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_4) << 1)
-                              | (0b00000100 & HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_5) << 2));
-        send_can_message(CAN_ID_VGPIO_DASHBOARD, &vgpio_can_register, 1);
+//        vgpio_can_register = ((0b00000001 & HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_3) << 0)
+//                              | (0b00000010 & HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_4) << 1)
+//                              | (0b00000100 & HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_5) << 2));
+//        send_can_message(CAN_ID_VGPIO_DASHBOARD, &vgpio_can_register, 1);
 
         // Queue an update for the LEDS
         update_led(&hspi2);
