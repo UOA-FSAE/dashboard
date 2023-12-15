@@ -80,7 +80,7 @@ void init_energy_screen() {
     lv_obj_add_style(glv_power, &accumulator_style, LV_PART_INDICATOR);
     lv_obj_set_size(glv_power, 80, 140);
     lv_obj_align(glv_power, LV_ALIGN_CENTER, 70, 20);
-    lv_bar_set_range(glv_power, 220, 294);
+    lv_bar_set_range(glv_power, 220, 280);
     lv_bar_set_value(glv_power, 0, LV_ANIM_OFF);
 
     glv_text = lv_label_create(energy_screen);     // GLV Live Text
