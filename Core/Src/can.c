@@ -176,6 +176,8 @@ float process_can_decimal(int integer, int neg_exponent) {
     return (float) integer * exp_lookup[neg_exponent];
 }
 
+enum led_meaning drive_led_map[4] = {RL,FL,FR,RR};
+
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
     CAN_RxHeaderTypeDef RxHeader;
     uint8_t RxData[8];
@@ -392,14 +394,14 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
             the_vehicle.drive[i].errorCode = (RxData[7] << 8 & 0xFF00) | RxData[6];
 
             if (!the_vehicle.drive[i].driveActive) {    //MoTeC is saying the drive is not active, this is most important
-                set_led(RL, LED_RED);
+                set_led(drive_led_map[i], LED_RED);
             } else if (the_vehicle.drive[i].derating) {
-                set_led(RL, LED_BLUE);
+                set_led(drive_led_map[i], LED_BLUE);
             } else if (the_vehicle.drive[i].inverterTemp > 50 || the_vehicle.drive[i].motorTemp > 60 ||
                        the_vehicle.drive[i].gearboxTemp > 40) {        //Something is a little warm
-                set_led(RL, LED_YELLOW);
+                set_led(drive_led_map[i], LED_YELLOW);
             } else {
-                set_led(RL, LED_GREEN);
+                set_led(drive_led_map[i], LED_GREEN);
             }
             break;
         case CAN_ID_VGPIO_MOTEC:
