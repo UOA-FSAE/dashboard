@@ -9,6 +9,7 @@ enum SCREENS {
 	DEBUG_SCREEN,
     ENERGY_SCREEN,
     LAP_SCREEN,     // <- Insert after here (error should be last)
+    TEMPERATURE_SCREEN,
     ERROR_SCREEN
 };
 

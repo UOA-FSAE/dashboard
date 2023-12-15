@@ -6,6 +6,7 @@
 #include "debug_screen.h"
 #include "energy_screen.h"
 #include "lap_screen.h"
+#include "temperature_screen.h"
 #include "error_screen.h"
 #include "popups.h"
 
@@ -77,6 +78,7 @@ void init_screens() {
     init_energy_screen();
     init_lap_screen();
     init_popups();
+    init_temperature_screen();
     init_error_screen();
 }
 
@@ -95,6 +97,9 @@ void try_update_screen() {
             break;
         case LAP_SCREEN:
             update_lap_screen();
+            break;
+        case TEMPERATURE_SCREEN:
+            update_temperature_screen();
             break;
         case ERROR_SCREEN:
             update_error_screen();
@@ -139,6 +144,9 @@ void change_screens(enum SCREENS screen) {
         case LAP_SCREEN:
             load_lap_screen();
             break;
+        case TEMPERATURE_SCREEN:
+            load_temperature_screen();
+            break;
         case ERROR_SCREEN:
             load_error_screen();
             break;
@@ -152,7 +160,7 @@ void cycle_screens() {
 void try_cycle_screens() {
     if (screen_switch_flag && (current_screen != ERROR_SCREEN)){
         screen_switch_flag = 0;
-        current_screen = (current_screen + 1) % 4;
+        current_screen = (current_screen + 1) % 5;
         change_screens(current_screen);
     }
 }
